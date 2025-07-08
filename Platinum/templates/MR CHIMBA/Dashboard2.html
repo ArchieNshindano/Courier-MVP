@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safiri Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.0.18/24/outline/heroicons.min.css" rel="stylesheet">
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+
+        .active-nav-link { background-color: #e9f5ff; color: #007bff; font-weight: 600; }
+        .active-nav-link svg { color: #007bff; }
+
+        .page-content {
+            display: none; /* Hidden by default, JS will show active page */
+        }
+        .page-content.active {
+            display: block;
+            animation: fadeInPage 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Ensure chart canvas container has relative positioning for proper sizing */
+        .chart-container {
+            position: relative;
+            /* height is set by Tailwind classes like h-64, h-72 */
+            width: 100%;
+        }
+        .stat-value-animated {
+            opacity: 0; /* Start hidden for JS animation */
+        }
+
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'safiri-blue': '#007bff',
+                        'safiri-green': '#28a745',
+                        'safiri-dark': '#212529',
+                        'safiri-light-blue': '#e9f5ff',
+                        'safiri-medium-dark': '#343a40',
+                        'safiri-gray-bg': '#f9fafb',
+                        'safiri-border': '#e5e7eb',
+                    },
+                    // Removed animation from here as we use CSS keyframes directly
+                    // and trigger via JS class for page content.
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-safiri-gray-bg flex antialiased text-gray-800">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white h-screen fixed top-0 left-0 shadow-lg z-20 flex flex-col" id="sidebar">
+        <div class="px-6 py-5 border-b border-safiri-border">
+            <!-- Link to your main landing page if needed, or just a brand mark -->
+            <a href="index.html" class="text-2xl font-bold text-safiri-blue">safiri<span class="text-safiri-green">.</span></a>
+        </div>
+        <nav id="sidebar-nav" class="flex-grow px-4 py-4 space-y-1 overflow-y-auto">
+            <p class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
+            <a href="#dashboard" data-page="dashboard" data-title="Dashboard" class="nav-item flex items-center px-3 py-2.5 rounded-lg group hover:bg-safiri-light-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg>
+                Dashboard
+            </a>
+            <a href="#parcels" data-page="parcels" data-title="Manage Parcels" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10.5 11.25h3M12 15h.008m-1.008-7.5H7.5m1.586-3.424A2.252 2.252 0 017.5 4.5H6.75A2.25 2.25 0 004.5 6.75v.25M12 3v1.5m0 15V21m-3.75-1.5H6.75m10.5 0h1.5m-1.5 0S16.5 9.75 12 9.75s-4.5 4.5-4.5 4.5m9 0h1.5" /></svg>
+                Parcels
+            </a>
+            <a href="#hardware" data-page="hardware" data-title="Hardware Management" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-7.5h12c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125h-12c-.621 0-1.125.504-1.125 1.125v3.375c0 .621.504 1.125 1.125 1.125z" /></svg>
+                Hardware
+            </a>
+            <a href="#billing" data-page="billing" data-title="Billing & Invoices" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
+                Billing
+            </a>
+            <a href="#reports" data-page="reports" data-title="Reports & Analytics" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3M3.75 14.25V21a2.25 2.25 0 002.25 2.25h12a2.25 2.25 0 002.25-2.25v-6.75M9.75 16.5h4.5M12 3v1.5M12 6.75v1.5M12 10.5v1.5M12 14.25v1.5M12 18v1.5M12 21.75v1.5M4.5 3.75h15M4.5 7.5h15m-15 3.75h15" /></svg>
+                Reports
+            </a>
+             <a href="#messages" data-page="messages" data-title="Messages" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                    Messages
+                </div>
+                <span class="text-xs bg-safiri-green text-white font-semibold px-2 py-0.5 rounded-full">12</span>
+            </a>
+
+            <p class="px-2 py-1 pt-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
+             <a href="#settings" data-page="settings" data-title="Account Settings" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.096.573.393 1.086.808 1.466l.97.887c.47.43.747 1.057.747 1.708V12a2.25 2.25 0 01-2.25 2.25H9.375A2.25 2.25 0 017.125 12V9.282c0-.651.277-1.278.747-1.708l.97-.887c.415-.38.712-.893.808-1.466l.213-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9v5.25A2.25 2.25 0 0011.25 19.5h1.5A2.25 2.25 0 0015 17.25V12z" /></svg>
+                Settings
+            </a>
+            <a href="#help" data-page="help" data-title="Help & Support" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
+                Help
+            </a>
+        </nav>
+        <div class="px-4 py-4 mt-auto border-t border-safiri-border">
+            <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-safiri-light-blue hover:text-safiri-blue transition-colors">
+                <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-safiri-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                Log Out
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 ml-64 p-6 md:p-8">
+        <!-- Top Bar -->
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 id="main-header-title" class="text-3xl font-bold text-safiri-dark">Dashboard</h1>
+                <p id="main-header-subtitle" class="text-sm text-gray-500">Overview of your Safiri operations.</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search anything..." class="pl-10 pr-4 py-2 w-64 border border-safiri-border rounded-lg focus:ring-2 focus:ring-safiri-blue focus:border-transparent outline-none transition-all">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                </div>
+                <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <svg class="w-6 h-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                </button>
+                <img src="https://via.placeholder.com/40" alt="User Avatar" class="w-10 h-10 rounded-full cursor-pointer">
+            </div>
+        </header>
+
+        <!-- Page Content Area -->
+        <div id="page-content-area">
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" class="page-content space-y-6">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                        <h3 class="text-sm font-medium text-gray-500">Total Parcels Processed</h3>
+                        <p class="stat-value-animated text-3xl font-bold text-safiri-dark mt-1" data-target-value="18673" data-is-integer="true">0</p>
+                        <p class="text-xs text-green-500 mt-1 flex items-center">
+                            <svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 17a.75.75 0 01-.707-.464l-3-6a.75.75 0 011.414-.708l3 6A.75.75 0 0110 17z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 3a.75.75 0 01.707.464l3 6a.75.75 0 11-1.414.708l-3-6A.75.75 0 0110 3z" clip-rule="evenodd" /></svg>
+                            5.7% Last Week
+                        </p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                        <h3 class="text-sm font-medium text-gray-500">Revenue This Month (ZMW)</h3>
+                        <p class="stat-value-animated text-3xl font-bold text-safiri-dark mt-1" data-target-value="46682.50" data-decimals="2">0</p>
+                         <p class="text-xs text-green-500 mt-1 flex items-center">
+                            <svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 17a.75.75 0 01-.707-.464l-3-6a.75.75 0 011.414-.708l3 6A.75.75 0 0110 17z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 3a.75.75 0 01.707.464l3 6a.75.75 0 11-1.414.708l-3-6A.75.75 0 0110 3z" clip-rule="evenodd" /></svg>
+                            ZMW 1,230.00 Today
+                        </p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                        <h3 class="text-sm font-medium text-gray-500">Active Deliveries</h3>
+                        <p class="stat-value-animated text-3xl font-bold text-safiri-dark mt-1" data-target-value="1673" data-is-integer="true">0</p>
+                        <p class="text-xs text-red-500 mt-1 flex items-center">
+                            <svg class="w-3 h-3 mr-1 transform rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 17a.75.75 0 01-.707-.464l-3-6a.75.75 0 011.414-.708l3 6A.75.75 0 0110 17z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 3a.75.75 0 01.707.464l3 6a.75.75 0 11-1.414.708l-3-6A.75.75 0 0110 3z" clip-rule="evenodd" /></svg>
+                            2.1% Less than Yesterday
+                        </p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                        <h3 class="text-sm font-medium text-gray-500">Hardware Units Deployed</h3>
+                        <p class="stat-value-animated text-3xl font-bold text-safiri-dark mt-1" data-target-value="275" data-is-integer="true">0</p>
+                        <p class="text-xs text-gray-500 mt-1">Across all locations</p>
+                    </div>
+                </div>
+
+                <!-- Charts Row 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-safiri-dark">Parcel Volume Trend</h3>
+                            <span class="text-xs text-gray-400">Last 7 Days</span>
+                        </div>
+                        <div class="chart-container h-64"> <canvas id="parcelVolumeChart"></canvas> </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                         <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-safiri-dark">Revenue by Location</h3>
+                             <button class="text-xs text-safiri-blue hover:underline">View All</button>
+                        </div>
+                        <div class="chart-container h-64"> <canvas id="revenueLocationChart"></canvas> </div>
+                    </div>
+                </div>
+
+                <!-- Chart Row 2: Pie Chart -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                        <h3 class="text-lg font-semibold text-safiri-dark mb-4">Parcel Status Breakdown</h3>
+                        <div class="chart-container h-64 md:h-72"> <canvas id="parcelStatusChart"></canvas> </div>
+                    </div>
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                         <h3 class="text-lg font-semibold text-safiri-dark mb-4">Delivery Hotspots (Map Placeholder)</h3>
+                         <div class="h-64 md:h-72 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+                            [Interactive Map Placeholder: e.g., Leaflet.js or Google Maps]
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Recent Parcels Table -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-safiri-dark">Recent Parcels</h3>
+                        <a href="#" class="text-sm text-safiri-blue hover:underline">View All Parcels</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Parcel ID</th> <th scope="col" class="px-6 py-3">Status</th>
+                                    <th scope="col" class="px-6 py-3">Origin</th> <th scope="col" class="px-6 py-3">Destination</th>
+                                    <th scope="col" class="px-6 py-3">Date</th> <th scope="col" class="px-6 py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-gray-900">SFR-001258</td>
+                                    <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">In Transit</span></td>
+                                    <td class="px-6 py-4">Lusaka Hub</td> <td class="px-6 py-4">Ndola Branch</td>
+                                    <td class="px-6 py-4">Nov 04, 2023</td> <td class="px-6 py-4"><a href="#" class="text-safiri-blue hover:underline">Track</a></td>
+                                </tr>
+                                 <tr class="bg-white border-b hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-gray-900">SFR-001257</td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Delivered</span></td>
+                                    <td class="px-6 py-4">Kitwe Office</td> <td class="px-6 py-4">Solwezi Drop-off</td>
+                                    <td class="px-6 py-4">Nov 03, 2023</td> <td class="px-6 py-4"><a href="#" class="text-safiri-blue hover:underline">Details</a></td>
+                                </tr>
+                                <tr class="bg-white hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-gray-900">SFR-001256</td>
+                                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Processing</span></td>
+                                    <td class="px-6 py-4">Livingstone Center</td> <td class="px-6 py-4">Lusaka Hub</td>
+                                    <td class="px-6 py-4">Nov 05, 2023</td> <td class="px-6 py-4"><a href="#" class="text-safiri-blue hover:underline">Track</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Creative Bottom Sections -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border transform hover:-translate-y-1 transition-all">
+                        <h3 class="text-lg font-semibold text-safiri-dark mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button class="w-full flex items-center justify-center text-left py-3 px-4 bg-safiri-blue text-white rounded-lg hover:bg-blue-700 transition-colors transform hover:scale-105">
+                                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                Create New Parcel
+                            </button>
+                            <button class="w-full flex items-center justify-center text-left py-3 px-4 bg-safiri-green text-white rounded-lg hover:bg-green-700 transition-colors transform hover:scale-105">
+                                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.018-.991-.053-1.448l-.112-.486a2.25 2.25 0 00-2.035-1.686l-2.76-.31a2.25 2.25 0 00-2.348 1.022l-.606.908c-.32.478-.916.72-1.518.62l-2.08-.277a2.25 2.25 0 01-1.883-2.18l-.277-2.079a2.25 2.25 0 01.62-1.518l.908-.606a2.25 2.25 0 001.022-2.348l-.31-2.76a2.25 2.25 0 00-1.686-2.035l-.486-.112A48.91 48.91 0 006.75 2.25H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                                Request Support Call
+                            </button>
+                             <button class="w-full flex items-center justify-center text-left py-3 px-4 bg-gray-100 text-safiri-dark rounded-lg hover:bg-gray-200 transition-colors border border-safiri-border transform hover:scale-105">
+                                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                                Download Monthly Report
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border transform hover:-translate-y-1 transition-all">
+                        <h3 class="text-lg font-semibold text-safiri-dark mb-4">Notifications & Alerts</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start p-3 bg-yellow-50 border border-yellow-200 rounded-lg hover:shadow-md transition-shadow">
+                                <svg class="w-5 h-5 text-yellow-500 mr-3 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                                <div>
+                                    <p class="text-sm font-medium text-yellow-700">Upcoming Maintenance</p>
+                                    <p class="text-xs text-yellow-600">POS Terminal software update scheduled for Nov 10, 02:00 AM.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-3 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md transition-shadow">
+                                <svg class="w-5 h-5 text-blue-500 mr-3 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd" /></svg>
+                                <div>
+                                    <p class="text-sm font-medium text-blue-700">New Feature Added</p>
+                                    <p class="text-xs text-blue-600">Bulk parcel import via CSV is now available in the "Parcels" section.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End #dashboard-content -->
+
+            <!-- Parcels Content (Placeholder) -->
+            <div id="parcels-content" class="page-content space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Manage Your Parcels</h2>
+                    <p class="text-gray-600">This section will allow you to create, track, and manage all parcels. View detailed logs, update statuses, and search for specific shipments.</p>
+                    <div class="mt-6 overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">Parcel ID</th> <th scope="col" class="px-6 py-3">Status</th>
+                                    <th scope="col" class="px-6 py-3">Customer</th> <th scope="col" class="px-6 py-3">Destination</th>
+                                    <th scope="col" class="px-6 py-3">Last Update</th> <th scope="col" class="px-6 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-gray-900">SFR-001299</td>
+                                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Out for Delivery</span></td>
+                                    <td class="px-6 py-4">John Doe</td> <td class="px-6 py-4">Kabwe Town</td>
+                                    <td class="px-6 py-4">Nov 06, 2023 - 09:15</td>
+                                    <td class="px-6 py-4 space-x-2">
+                                        <a href="#" class="text-safiri-blue hover:underline">Track</a>
+                                        <a href="#" class="text-safiri-green hover:underline">Edit</a>
+                                    </td>
+                                </tr>
+                                 <tr class="bg-white border-b hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-gray-900">SFR-001298</td>
+                                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">Processing</span></td>
+                                    <td class="px-6 py-4">Jane Smith</td> <td class="px-6 py-4">Chipata City</td>
+                                    <td class="px-6 py-4">Nov 06, 2023 - 08:30</td>
+                                    <td class="px-6 py-4 space-x-2">
+                                        <a href="#" class="text-safiri-blue hover:underline">Track</a>
+                                        <a href="#" class="text-safiri-green hover:underline">Edit</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hardware Content (Placeholder) -->
+            <div id="hardware-content" class="page-content space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Deployed Hardware Units</h2>
+                    <p class="text-gray-600">View the status and details of all hardware units (Smart Phones, POS Terminals, Printers, GPS Trackers) deployed across your locations. Monitor device health and request support.</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="p-4 border rounded-lg bg-gray-50">
+                            <h4 class="font-semibold">Smart Phone #SP001</h4>
+                            <p class="text-xs text-gray-500">Status: <span class="text-green-600">Online</span> | Location: Lusaka Hub</p>
+                        </div>
+                        <div class="p-4 border rounded-lg bg-gray-50">
+                            <h4 class="font-semibold">POS Terminal #POS034</h4>
+                            <p class="text-xs text-gray-500">Status: <span class="text-red-600">Offline</span> | Location: Ndola Branch</p>
+                        </div>
+                         <div class="p-4 border rounded-lg bg-gray-50">
+                            <h4 class="font-semibold">GPS Tracker #GPS077</h4>
+                            <p class="text-xs text-gray-500">Status: <span class="text-green-600">Active</span> | Vehicle: GRZ-123-AB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Content (Placeholder) -->
+            <div id="billing-content" class="page-content space-y-6">
+                 <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Billing & Invoices</h2>
+                    <p class="text-gray-600">Access your monthly invoices based on the ZMW 2.50 per parcel plan. View payment history and manage your subscription.</p>
+                     <button class="mt-4 py-2 px-4 bg-safiri-blue text-white rounded-lg hover:bg-blue-700">View Current Invoice</button>
+                </div>
+            </div>
+            <!-- Reports Content (Placeholder) -->
+            <div id="reports-content" class="page-content space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Detailed Reports</h2>
+                    <p class="text-gray-600">Generate and download comprehensive reports on parcel volumes, revenue, delivery times, hardware utilization, and more.</p>
+                    <button class="mt-4 py-2 px-4 bg-safiri-green text-white rounded-lg hover:bg-green-700">Generate New Report</button>
+                </div>
+            </div>
+            <!-- Messages Content (Placeholder) -->
+            <div id="messages-content" class="page-content space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Your Messages</h2>
+                    <p class="text-gray-600">View important notifications, system alerts, and messages from Safiri support here.</p>
+                    <div class="mt-4 border-t pt-4">
+                        <p class="text-sm">No new messages.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Settings Content (Placeholder) -->
+            <div id="settings-content" class="page-content space-y-6">
+                 <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Account Settings</h2>
+                    <p class="text-gray-600">Manage your company profile, user accounts, notification preferences, and API keys.</p>
+                     <button class="mt-4 py-2 px-4 bg-gray-200 text-safiri-dark rounded-lg hover:bg-gray-300">Edit Profile</button>
+                </div>
+            </div>
+            <!-- Help Content (Placeholder) -->
+            <div id="help-content" class="page-content space-y-6">
+                 <div class="bg-white p-6 rounded-xl shadow-lg border border-safiri-border">
+                    <h2 class="text-xl font-semibold text-safiri-dark mb-4">Help & Support Center</h2>
+                    <p class="text-gray-600">Find answers to frequently asked questions, access documentation, or contact our support team.</p>
+                    <a href="mailto:support@safiri.app" class="mt-4 inline-block py-2 px-4 bg-safiri-blue text-white rounded-lg hover:bg-blue-700">Contact Support</a>
+                </div>
+            </div>
+
+        </div> <!-- End #page-content-area -->
+        
+        <footer class="text-center text-sm text-gray-500 pt-8">
+            © <span id="currentYear"></span> SAFIRI APPS LTD. All Rights Reserved. Client Dashboard.
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Store chart instances
+        let parcelVolumeChartInstance, revenueLocationChartInstance, parcelStatusChartInstance;
+
+
+        // --- Chart Initializations (called when dashboard page is shown) ---
+        function initDashboardCharts() {
+            if (parcelVolumeChartInstance) parcelVolumeChartInstance.destroy(); // Destroy if already exists
+            const parcelVolumeCtx = document.getElementById('parcelVolumeChart').getContext('2d');
+            parcelVolumeChartInstance = new Chart(parcelVolumeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Parcels Processed', data: [120, 190, 150, 220, 180, 250, 210],
+                        borderColor: '#007bff', backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.3, fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { yAxes: [{ ticks: { beginAtZero: true, fontColor: '#6b7280' }, gridLines: { color: "rgba(229, 231, 235, 0.5)" } }], xAxes: [{ ticks: { fontColor: '#6b7280' }, gridLines: { display: false } }] },
+                    legend: { display: true, position: 'top', labels: { fontColor: '#374151' } },
+                    tooltips: { backgroundColor: '#212529', titleFontColor: '#ffffff', bodyFontColor: '#ffffff', borderColor: '#343a40', borderWidth: 1 }
+                }
+            });
+
+            if (revenueLocationChartInstance) revenueLocationChartInstance.destroy();
+            const revenueLocationCtx = document.getElementById('revenueLocationChart').getContext('2d');
+            revenueLocationChartInstance = new Chart(revenueLocationCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Lusaka', 'Ndola', 'Kitwe', 'Livingstone', 'Solwezi'],
+                    datasets: [{
+                        label: 'Revenue (ZMW)', data: [15500, 12200, 9800, 7500, 5300],
+                        backgroundColor: ['rgba(0, 123, 255, 0.7)', 'rgba(40, 167, 69, 0.7)', 'rgba(0, 123, 255, 0.5)', 'rgba(40, 167, 69, 0.5)', 'rgba(0, 123, 255, 0.3)'],
+                        borderColor: ['rgba(0, 123, 255, 1)', 'rgba(40, 167, 69, 1)', 'rgba(0, 123, 255, 1)', 'rgba(40, 167, 69, 1)', 'rgba(0, 123, 255, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { yAxes: [{ ticks: { beginAtZero: true, fontColor: '#6b7280', callback: function(v) { return 'ZMW ' + v.toLocaleString(); } }, gridLines: { color: "rgba(229, 231, 235, 0.5)" } }], xAxes: [{ ticks: { fontColor: '#6b7280' }, gridLines: { display: false } }] },
+                    legend: { display: false },
+                    tooltips: { backgroundColor: '#212529', titleFontColor: '#ffffff', bodyFontColor: '#ffffff', callbacks: { label: function(ti, d) { return (d.datasets[ti.datasetIndex].label || '') + ': ZMW ' + ti.yLabel.toLocaleString(); } } }
+                }
+            });
+
+            if (parcelStatusChartInstance) parcelStatusChartInstance.destroy();
+            const parcelStatusCtx = document.getElementById('parcelStatusChart').getContext('2d');
+            parcelStatusChartInstance = new Chart(parcelStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Processing', 'In Transit', 'Delivered', 'Issues/Hold'],
+                    datasets: [{
+                        label: 'Parcel Status', data: [350, 720, 1250, 80],
+                        backgroundColor: ['rgba(0, 123, 255, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(40, 167, 69, 0.7)', 'rgba(220, 53, 69, 0.7)'],
+                        borderColor: ['#007bff', '#ffc107', '#28a745', '#dc3545'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    legend: { position: 'bottom', labels: { fontColor: '#374151', padding: 15 } },
+                    tooltips: { backgroundColor: '#212529', titleFontColor: '#ffffff', bodyFontColor: '#ffffff', callbacks: { label: function(ti, d) { const ds = d.datasets[ti.datasetIndex]; const val = ds.data[ti.index]; const lbl = d.labels[ti.index]; return `${lbl}: ${val}`; } } },
+                    cutoutPercentage: 40
+                }
+            });
+        }
+
+        // Incremental Number Animation
+        function animateStatValue(element, start, end, duration, isInteger = false, decimals = 0) {
+            element.style.opacity = '0'; // Start hidden
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                let currentValue = progress * (end - start) + start;
+                if (isInteger) {
+                    element.textContent = Math.floor(currentValue).toLocaleString();
+                } else {
+                    element.textContent = parseFloat(currentValue).toFixed(decimals);
+                }
+                element.style.opacity = progress; // Fade in as it animates
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    if (isInteger) {
+                        element.textContent = Math.floor(end).toLocaleString();
+                    } else {
+                        element.textContent = parseFloat(end).toFixed(decimals);
+                    }
+                    element.style.opacity = '1';
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function triggerStatAnimations() {
+            document.querySelectorAll('#dashboard-content .stat-value-animated').forEach(el => {
+                if (!el.classList.contains('animated')) { // Animate only once
+                    const target = parseFloat(el.dataset.targetValue);
+                    const isInt = el.dataset.isInteger === 'true';
+                    const dec = parseInt(el.dataset.decimals) || 0;
+                    animateStatValue(el, 0, target, 1500, isInt, dec);
+                    el.classList.add('animated');
+                }
+            });
+        }
+
+
+        // --- Dynamic Page Navigation ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('#sidebar-nav .nav-item');
+            const pageContents = document.querySelectorAll('#page-content-area .page-content');
+            const mainHeaderTitle = document.getElementById('main-header-title');
+            const mainHeaderSubtitle = document.getElementById('main-header-subtitle');
+            const defaultPage = 'dashboard';
+
+            const pageSubtitles = {
+                dashboard: "Overview of your Safiri operations.",
+                parcels: "Create, track, and manage all shipments.",
+                hardware: "Monitor deployed devices and their status.",
+                billing: "View invoices and payment history.",
+                reports: "Generate insights on your operations.",
+                messages: "Check notifications and system alerts.",
+                settings: "Configure your account and preferences.",
+                help: "Find answers and contact support."
+            };
+
+            function showPage(pageId, pageTitle) {
+                pageContents.forEach(content => content.classList.remove('active'));
+                const targetPage = document.getElementById(pageId + '-content');
+                if (targetPage) targetPage.classList.add('active');
+
+                navItems.forEach(item => {
+                    item.classList.remove('active-nav-link');
+                    if (item.dataset.page === pageId) item.classList.add('active-nav-link');
+                });
+
+                if (mainHeaderTitle) mainHeaderTitle.textContent = pageTitle;
+                if (mainHeaderSubtitle) mainHeaderSubtitle.textContent = pageSubtitles[pageId] || "Manage your Safiri account.";
+
+                // Initialize or update charts specifically for the dashboard page
+                if (pageId === 'dashboard') {
+                    // Timeout to ensure canvas is visible and sized before drawing
+                    setTimeout(() => {
+                        initDashboardCharts();
+                        triggerStatAnimations(); // Also trigger stat animations
+                    }, 50); // Small delay
+                } else {
+                    // If other pages have charts, they would be initialized here
+                    // For stat animations, clear the 'animated' class if you want them to re-animate on page switch
+                    document.querySelectorAll('#dashboard-content .stat-value-animated').forEach(el => el.classList.remove('animated'));
+                }
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const pageId = item.dataset.page;
+                    const pageTitle = item.dataset.title;
+                    showPage(pageId, pageTitle);
+                    window.location.hash = pageId; // Update hash for history
+                });
+            });
+
+            // Handle initial page load based on hash or default
+            let initialPage = window.location.hash.substring(1) || defaultPage;
+            const initialLink = document.querySelector(`.nav-item[data-page="${initialPage}"]`);
+            if (!initialLink) { // Fallback if hash is invalid
+                initialPage = defaultPage;
+            }
+            const initialTitle = initialLink ? initialLink.dataset.title : 'Dashboard';
+            showPage(initialPage, initialTitle);
+        });
+
+    </script>
+</body>
+</html>

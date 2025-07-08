@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Parcel - Platinum Apps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles can be added here if needed */
+    </style>
+    <script>
+        window.isGoogleMapsApiReady = false;
+        window.initGoogleMapsApi = function () {
+            window.isGoogleMapsApiReady = true;
+            console.log("Google Maps API Initialized for Tracking Page.");
+        };
+    </script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=YourKey&callback=initGoogleMapsApi&libraries=geometry,places"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+
+    <header class="bg-white shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">platinum<span class="text-green-500">.</span></a>
+            <a href="{% url 'login' %}" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-5 rounded-full transition duration-300">
+                Client Login
+            </a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-16">
+        <div class="max-w-4xl mx-auto">
+            <!-- Tracking Input Section -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-2">Track Your Shipment</h1>
+                <p class="text-center text-gray-500 mb-6">Enter any tracking number to see a demonstration of our live map.</p>
+                <form id="track-form" class="max-w-lg mx-auto">
+                    <div class="flex flex-col sm:flex-row items-center gap-2">
+                        <input type="text" id="tracking-input" placeholder="Enter any text or number..." required class="flex-grow w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 text-white font-bold py-3 px-8 rounded-md hover:bg-blue-700 transition-transform transform hover:scale-105">Track</button>
+                    </div>
+                </form>
+                <p id="status-message" class="text-center font-semibold h-5 mt-4"></p>
+            </div>
+
+            <!-- Results Section (Hidden by default) -->
+            <div id="results-container" class="hidden mt-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Live Route Demonstration</h2>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div id="map-container" class="w-full h-96 md:h-[500px] bg-gray-200">
+                        <!-- Map will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 text-center py-6 mt-8">
+        <p class="text-gray-500 text-sm"></p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const trackForm = document.getElementById('track-form');
+            const trackingInput = document.getElementById('tracking-input');
+            const statusMessage = document.getElementById('status-message');
+            const resultsContainer = document.getElementById('results-container');
+            const mapContainer = document.getElementById('map-container');
+
+            trackForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const trackingNumber = trackingInput.value.trim();
+
+                // Check only if the input is empty or not.
+                if (!trackingNumber) {
+                    statusMessage.textContent = "Please enter something in the tracking field.";
+                    statusMessage.className = "text-center font-semibold text-red-500 h-5 mt-4";
+                    return;
+                }
+
+                resetUI();
+                statusMessage.textContent = 'Processing request...';
+                statusMessage.className = "text-center font-semibold text-gray-600 h-5 mt-4";
+
+                // Simulate network request
+                setTimeout(() => {
+                    // MODIFIED: No validation. Always show the map if input is not empty.
+                    statusMessage.textContent = 'Loading map demonstration...';
+                    statusMessage.className = "text-center font-semibold text-green-600 h-5 mt-4";
+                    displayDemoMap();
+                }, 700);
+            });
+
+            function displayDemoMap() {
+                resultsContainer.classList.remove('hidden');
+
+                if (!window.isGoogleMapsApiReady) {
+                    setTimeout(displayDemoMap, 200); // Retry if maps API isn't ready
+                    return;
+                }
+
+                const origin = { lat: -15.4167, lng: 28.2833 }; // Lusaka
+                const destination = { lat: -12.9667, lng: 28.6333 }; // Ndola
+
+                const directionsService = new google.maps.DirectionsService();
+                const directionsRenderer = new google.maps.DirectionsRenderer({
+                    suppressMarkers: true, // We'll add custom ones
+                    polylineOptions: { strokeColor: '#007bff', strokeWeight: 5, strokeOpacity: 0.8 }
+                });
+
+                const map = new google.maps.Map(mapContainer, {
+                    zoom: 7,
+                    center: origin,
+                    disableDefaultUI: true,
+                    zoomControl: true,
+                });
+
+                directionsRenderer.setMap(map);
+
+                const request = {
+                    origin: origin,
+                    destination: destination,
+                    travelMode: 'DRIVING'
+                };
+
+                directionsService.route(request, (result, status) => {
+                    if (status == 'OK') {
+                        directionsRenderer.setDirections(result);
+
+                        // Add custom origin marker
+                        new google.maps.Marker({
+                            position: origin,
+                            map: map,
+                            title: 'Origin: Lusaka',
+                            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                        });
+
+                        // Add custom destination marker
+                        new google.maps.Marker({
+                            position: destination,
+                            map: map,
+                            title: 'Destination: Ndola',
+                            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                        });
+
+                    } else {
+                        mapContainer.innerHTML = `<div class="p-4 text-center text-red-500">Could not display map route. Status: ${status}</div>`;
+                    }
+                });
+            }
+
+            function resetUI() {
+                resultsContainer.classList.add('hidden');
+                mapContainer.innerHTML = '';
+            }
+        });
+    </script>
+
+</body>
+</html>

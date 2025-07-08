@@ -1,0 +1,316 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login - Platinum Parcel Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --platinum-blue: #007bff;
+            --platinum-green: #28a745;
+            --platinum-dark: #212529;
+            --platinum-gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e9f5ff 0%, #ffffff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .logo {
+            max-width: 180px;
+            margin-bottom: 20px;
+        }
+
+        .login-card h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--platinum-dark);
+            margin-bottom: 10px;
+        }
+
+        .login-card p {
+            color: var(--platinum-gray);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+            .input-group i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #ccc;
+                transition: color 0.3s ease;
+            }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
+        }
+
+            .input-field:focus {
+                border-color: var(--platinum-blue);
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+            }
+
+                .input-field:focus + i {
+                    color: var(--platinum-blue);
+                }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--platinum-blue);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .login-button:hover:not(:disabled) {
+                background-color: #0069d9;
+                transform: translateY(-2px);
+            }
+
+            .login-button:disabled {
+                background-color: #6eaefb;
+                cursor: not-allowed;
+            }
+
+        .button-text {
+            transition: opacity 0.2s ease;
+        }
+
+        .spinner {
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s ease-in-out infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -10px;
+            margin-left: -10px;
+        }
+
+        .login-button.loading .button-text {
+            opacity: 0;
+        }
+
+        .login-button.loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #firebase-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none; /* Hide by default, show with JS */
+        }
+
+        .firebase-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .firebase-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .signup-link {
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--platinum-gray);
+        }
+
+            .signup-link a {
+                color: var(--platinum-blue);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .signup-link a:hover {
+                    text-decoration: underline;
+                }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <!-- ========== THIS IS THE CORRECTED LINE ========== -->
+        <img src="{% static 'images/platinum-hero-image.jpg' %}" alt="Platinum Logo" class="logo">
+
+        <h2>Welcome Back!</h2>
+        <p>Please enter your credentials to log in.</p>
+
+        <div id="firebase-login-form">
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="Email Address" required>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="Password" required>
+                <i class="fas fa-lock"></i>
+            </div>
+
+            <button type="button" id="firebaseSignInBtn" class="login-button">
+                <span class="button-text">Login</span>
+                <div class="spinner"></div>
+            </button>
+        </div>
+
+        <div id="firebase-status"></div>
+
+        <div class="signup-link">
+            Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDK - No changes needed here -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "your details",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // DOM Elements
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const firebaseSignInBtn = document.getElementById('firebaseSignInBtn');
+        const firebaseStatusDiv = document.getElementById('firebase-status');
+
+        // Function to set button state (loading or normal)
+        const setButtonLoading = (isLoading) => {
+            if (isLoading) {
+                firebaseSignInBtn.classList.add('loading');
+                firebaseSignInBtn.disabled = true;
+            } else {
+                firebaseSignInBtn.classList.remove('loading');
+                firebaseSignInBtn.disabled = false;
+            }
+        };
+
+        // Function to show status messages
+        const showStatus = (message, type) => {
+            firebaseStatusDiv.textContent = message;
+            firebaseStatusDiv.className = `firebase-${type}`; // 'firebase-success' or 'firebase-error'
+        };
+
+        const handleSignIn = () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                showStatus('Please enter both email and password.', 'error');
+                return;
+            }
+
+            // Show loading state
+            setButtonLoading(true);
+            firebaseStatusDiv.style.display = 'none'; // Hide previous messages
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    showStatus('Sign in successful! Redirecting...', 'success');
+
+                    // Redirect to Django dashboard after a short delay to show the success message
+                    setTimeout(() => {
+                        window.location.href = "{% url 'dashboard' %}";
+                    }, 1000);
+                })
+                .catch((error) => {
+                    const errorMessage = error.code === 'auth/invalid-credential'
+                        ? 'Invalid email or password. Please try again.'
+                        : error.message;
+
+                    showStatus(errorMessage, 'error');
+                    setButtonLoading(false); // Re-enable button on error
+                });
+        };
+
+        firebaseSignInBtn.addEventListener('click', handleSignIn);
+
+        // Allow pressing Enter key to submit
+        passwordInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                handleSignIn();
+            }
+        });
+    </script>
+</body>
+</html>

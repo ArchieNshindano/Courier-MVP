@@ -1,0 +1,306 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started with Platinum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-label {
+            @apply block text-sm font-medium text-gray-700;
+        }
+
+        .form-input {
+            @apply mt-1 block w-full px-3.5 py-2.5 bg-white border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-platinum-blue focus:border-platinum-blue sm:text-sm transition-all;
+        }
+
+        .form-radio-label {
+            @apply ml-2 block text-sm text-gray-800;
+        }
+
+        .form-radio {
+            @apply h-4 w-4 text-platinum-blue border-gray-300 focus:ring-platinum-blue;
+        }
+
+        .form-checkbox {
+            @apply h-4 w-4 text-platinum-blue border-gray-300 rounded focus:ring-platinum-blue;
+        }
+
+        .form-error {
+            @apply text-xs text-red-500 mt-1;
+        }
+
+        .left-panel-gradient {
+            background: linear-gradient(135deg, #007bff 0%, #28a745 100%);
+        }
+
+        .radio-option-selected {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'platinum-blue': '#007bff', 'platinum-green': '#28a745',
+                        'platinum-dark-text': '#111827', 'platinum-light-text': '#6b7280',
+                        'platinum-bg': '#f9fafb', 'platinum-border': '#d1d5db',
+                    },
+                    boxShadow: {
+                        'input-focus': '0 0 0 2px rgba(0, 123, 255, 0.2)',
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-platinum-bg min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+    <div class="bg-white w-full max-w-4xl mx-auto rounded-xl shadow-card overflow-hidden lg:flex">
+        <!-- Left Panel: Branding & Info -->
+        <div class="w-full lg:w-2/5 left-panel-gradient text-white p-8 sm:p-12 flex flex-col justify-center">
+            <a href="index.html" class="text-3xl font-bold mb-6">Platinum<span class="text-green-500">.</span></a>
+            <h1 class="text-3xl sm:text-4xl font-bold leading-tight mb-4">Partner with Platinum.</h1>
+            <p class="text-base sm:text-lg opacity-90 mb-8">Empower your courier service with our seamless parcel management platform. No upfront hardware costs, scale with confidence.</p>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 mr-3 mt-1 flex-shrink-0 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div><h3 class="font-semibold">Zero Upfront Costs</h3><p class="text-sm opacity-80">Full hardware deployment covered by us.</p></div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 mr-3 mt-1 flex-shrink-0 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <div><h3 class="font-semibold">Boost Efficiency</h3><p class="text-sm opacity-80">Greater accuracy, speed, and accountability.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Sign-up Form -->
+        <div class="w-full lg:w-3/5 p-8 sm:p-12">
+            <div class="mb-8">
+                <h2 class="text-2xl sm:text-3xl font-bold text-platinum-dark-text">Create Your Platinum Account</h2>
+                <p class="mt-2 text-sm text-platinum-light-text">
+                    Already have an account?
+                    <a href="login.html" class="font-medium text-platinum-blue hover:underline">Log in here</a>
+                </p>
+            </div>
+
+            <form id="platinumSignupForm" class="space-y-5">
+                <div>
+                    <label for="companyName" class="form-label">Company Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="companyName" id="companyName" required class="form-input" placeholder="Your Company Ltd.">
+                </div>
+                <div>
+                    <label for="adminFullName" class="form-label">Your Full Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="adminFullName" id="adminFullName" required class="form-input" placeholder="John Doe">
+                </div>
+                <div>
+                    <label for="adminEmail" class="form-label">Work Email (This will be your login) <span class="text-red-500">*</span></label>
+                    <input type="email" name="adminEmail" id="adminEmail" required class="form-input" placeholder="you@company.com">
+                </div>
+                <div>
+                    <label for="adminPassword" class="form-label">Create Password <span class="text-red-500">*</span></label>
+                    <input type="password" name="adminPassword" id="adminPassword" required class="form-input" placeholder="Min. 6 characters">
+                </div>
+                <div>
+                    <label for="country" class="form-label">Country of Operation <span class="text-red-500">*</span></label>
+                    <select id="country" name="country" required class="form-input">
+                        <option value="">Select Country</option>
+                        <option value="ZM" selected>Zambia</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="KE">Kenya</option>
+                        <option value="TZ">Tanzania</option>
+                        <option value="ZW">Zimbabwe</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <fieldset class="pt-2">
+                    <legend class="form-label mb-2">Primary Service Interest <span class="text-red-500">*</span></legend>
+                    <div class="space-y-3">
+                        <label for="plan-lion" class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-platinum-blue radio-option">
+                            <input type="radio" name="servicePlan" id="plan-lion" value="lion" class="form-radio" checked required>
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-gray-900">Lease-to-Own Parcel Management (Lion Plan)</span>
+                                <span class="block text-xs text-gray-500">Full hardware, software, and support. ZMW 2.50 per parcel.</span>
+                            </span>
+                        </label>
+                        <label for="plan-software" class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-platinum-blue radio-option">
+                            <input type="radio" name="servicePlan" id="plan-software" value="software_only" class="form-radio" required>
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-gray-900">Software Only Solution</span>
+                                <span class="block text-xs text-gray-500">Use your own hardware with our powerful platform.</span>
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+                <div class="flex items-start pt-2">
+                    <input id="terms" name="terms" type="checkbox" required class="form-checkbox mt-0.5">
+                    <label for="terms" class="ml-2 block text-sm text-platinum-light-text">
+                        I agree to the Platinum
+                        <a href="#" class="font-medium text-platinum-blue hover:underline">Terms & Conditions</a> and
+                        <a href="#" class="font-medium text-platinum-blue hover:underline">Privacy Policy</a>. <span class="text-red-500">*</span>
+                    </label>
+                </div>
+                <div id="form-error-message-signup" class="form-error hidden text-center font-medium"></div>
+
+                <div>
+                    <button type="submit" id="createAccountBtn"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-platinum-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-platinum-blue transition-colors disabled:opacity-50">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getDatabase,
+            ref,
+            set
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // Your web app's Firebase configuration - UNCHANGED
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // --- DOM Elements ---
+        const signupForm = document.getElementById('platinumSignupForm');
+        const formErrorMessage = document.getElementById('form-error-message-signup');
+        const radioOptions = document.querySelectorAll('.radio-option');
+        const createAccountBtn = document.getElementById('createAccountBtn');
+
+        // --- Radio Button Styling ---
+        radioOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                radioOptions.forEach(opt => opt.classList.remove('radio-option-selected'));
+                option.classList.add('radio-option-selected');
+                option.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+        const initiallyCheckedRadio = document.querySelector('.radio-option input[type="radio"]:checked');
+        if (initiallyCheckedRadio) {
+            initiallyCheckedRadio.closest('.radio-option').classList.add('radio-option-selected');
+        }
+
+        // --- Form Submission Logic ---
+        signupForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            formErrorMessage.classList.add('hidden');
+            formErrorMessage.textContent = '';
+            createAccountBtn.disabled = true;
+            createAccountBtn.textContent = 'Creating Account...';
+
+            this.querySelectorAll('.form-input.border-red-500').forEach(el => el.classList.remove('border-red-500'));
+
+            let allValid = true;
+            const requiredFields = this.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if ((field.type === 'checkbox' && !field.checked) || (field.type !== 'checkbox' && !field.value.trim())) {
+                    allValid = false;
+                    if (field.type !== 'checkbox') field.classList.add('border-red-500');
+                }
+            });
+            const selectedPlan = this.querySelector('input[name="servicePlan"]:checked');
+            if (!selectedPlan) {
+                allValid = false;
+            }
+
+            if (!allValid) {
+                formErrorMessage.textContent = "Please fill all required fields marked with *.";
+                formErrorMessage.classList.remove('hidden');
+                createAccountBtn.disabled = false;
+                createAccountBtn.textContent = 'Create Account';
+                return;
+            }
+
+            const companyName = document.getElementById('companyName').value;
+            const adminFullName = document.getElementById('adminFullName').value;
+            const adminEmail = document.getElementById('adminEmail').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+            const country = document.getElementById('country').value;
+            const servicePlan = selectedPlan.value;
+
+            try {
+                // 1. Create user in Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, adminEmail, adminPassword);
+                const user = userCredential.user;
+
+                // 2. Update Firebase Auth user's display name
+                await updateProfile(user, {
+                    displayName: adminFullName
+                });
+
+                // 3. Store initial company and admin data in Realtime Database
+                const companyId = companyName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || Date.now().toString();
+                const companyDataRef = ref(database, `companies/${companyId}`);
+
+                const companyData = {
+                    companyName: companyName,
+                    countryOfOperation: country,
+                    selectedServicePlan: servicePlan,
+                    primaryAdminUid: user.uid,
+                    primaryAdminName: adminFullName,
+                    primaryAdminEmail: user.email,
+                    registrationDate: new Date().toISOString(),
+                    status: "pending_details"
+                };
+
+                await set(companyDataRef, companyData);
+
+                // Create a mapping from user UID to their company ID for easier lookup
+                const userCompanyMapRef = ref(database, `userCompanyMap/${user.uid}`);
+                await set(userCompanyMapRef, { companyId: companyId });
+
+                console.log('Firebase Auth user created:', user);
+                console.log('Company data saved to RTDB:', companyData);
+
+                alert('Account Creation Successful!\n\nWelcome, ' + adminFullName + '!\nYour company "' + companyName + '" is registered.\nNext steps: Email verification and detailed company profile setup.');
+
+                signupForm.reset();
+                radioOptions.forEach(opt => opt.classList.remove('radio-option-selected'));
+                if (initiallyCheckedRadio) {
+                    initiallyCheckedRadio.closest('.radio-option').classList.add('radio-option-selected');
+                }
+
+            } catch (error) {
+                console.error("Firebase sign-up error:", error);
+                formErrorMessage.textContent = `Error: ${error.message}`;
+                formErrorMessage.classList.remove('hidden');
+            } finally {
+                createAccountBtn.disabled = false;
+                window.location.href = "{% url 'dashboard' %}"
+                createAccountBtn.textContent = 'Create Account';
+            }
+        });
+    </script>
+
+</body>
+</html>

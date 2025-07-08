@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platinum Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.0.18/24/outline/heroicons.min.css" rel="stylesheet">
+    <!-- NOTE: This is a temporary image URL and may expire. It's recommended to host this asset permanently. -->
+    <link rel="icon" href="https://scontent.flun1-2.fna.fbcdn.net/v/t39.30808-1/456211585_427763140277870_3257240512210872492_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=105&ccb=1-7&_nc_sid=2d3e12&_nc_eui2=AeH0uGBQkogdVu68AlqJ-JoMwncFKLm-IgbCdwUoub4iBl6Mf1qyvcCsL4uySB4u7dJNPiB95fR1HEJcTis-TB-H&_nc_ohc=8DQnlI_D5XEQ7kNvwGxWhbo&_nc_oc=Admh4pehhGq1HgsaF4vTd10tCt4AmO8XIjmtOeYpjhi5TO6kyGIGbeIQ-qvnLx7On5E&_nc_zt=24&_nc_ht=scontent.flun1-2.fna&_nc_gid=ZvLAFunn3QZq9FjbiV8E3Q&oh=00_AfNZveX-5cigaCI863VB-nemafw42d5xn8_JR_YAm5HbWw&oe=684E1EC8">
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #a1a1a1;
+            }
+
+        .active-nav-link {
+            background-color: #e9f5ff;
+            color: #007bff;
+            font-weight: 600;
+        }
+
+            .active-nav-link svg {
+                color: #007bff;
+            }
+
+        .page-content {
+            display: none;
+        }
+
+            .page-content.active {
+                display: block;
+                animation: fadeInPage 0.5s ease-out forwards;
+            }
+
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+            .login-container .input-group {
+                margin-bottom: 1rem;
+            }
+
+            .login-container input {
+                width: 100%;
+                padding: 0.75rem;
+                box-sizing: border-box;
+                border: 1px solid #dddfe2;
+                border-radius: 6px;
+            }
+
+            .login-container button {
+                width: 100%;
+                padding: 0.75rem;
+                border: none;
+                border-radius: 6px;
+                font-size: 1rem;
+                cursor: pointer;
+                font-weight: bold;
+                margin-top: 0.5rem;
+            }
+
+            .login-container .btn-primary {
+                background-color: #007bff;
+                color: white;
+            }
+
+                .login-container .btn-primary:hover {
+                    background-color: #0069d9;
+                }
+
+            .login-container .btn-secondary {
+                background-color: #e4e6eb;
+                color: #4b4f56;
+            }
+
+                .login-container .btn-secondary:hover {
+                    background-color: #d8dbdf;
+                }
+
+        #status-message {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: bold;
+            min-height: 1.2em;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        #track-parcel-content .tracking-grid {
+            display: flex;
+            flex-direction: column;
+            lg: flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            height: calc(100vh - 12rem);
+        }
+
+        .tracking-left-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tracking-left-panel-scrollable {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .tracking-map-panel {
+            flex-grow: 1;
+            display: flex;
+            position: relative;
+        }
+
+        #parcel-google-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .tab-content-tracking {
+            display: none;
+        }
+
+            .tab-content-tracking.active {
+                display: block;
+            }
+        /* Style for Google Places Autocomplete dropdown */
+        .pac-container {
+            z-index: 10000 !important;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'platinum-blue': '#007bff', 'platinum-green': '#28a745', 'platinum-dark': '#212529',
+                        'platinum-light-blue': '#e9f5ff', 'platinum-medium-dark': '#343a40', 'platinum-gray-bg': '#f9fafb',
+                        'platinum-border': '#e5e7eb',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Maps Initialization Script -->
+    <script>
+        window.directionsService = null;
+        window.directionsRenderer = null;
+        window.isGoogleMapsApiReady = false;
+
+        window.initGoogleMapsApi = function () {
+            window.directionsService = new google.maps.DirectionsService();
+            window.directionsRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true,
+                suppressPolylines: true
+            });
+            console.log("Google Maps API Initialized.");
+            window.isGoogleMapsApiReady = true;
+        };
+    </script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=yourKey&callback=initGoogleMapsApi&libraries=geometry,places"></script>
+</head>
+<body class="bg-platinum-gray-bg flex antialiased text-gray-800">
+
+    <!-- AUTHENTICATION CONTAINER -->
+    <div id="auth-wrapper" class="w-full min-h-screen flex items-center justify-center bg-gray-100">
+        <div class="login-container">
+            <h1 class="text-2xl font-bold text-center mb-2">Platinum<span class="text-platinum-green">.</span> Dashboard</h1>
+            <p class="text-center text-gray-500 mb-6">Please sign in to continue</p>
+            <div class="input-group"><input type="email" id="email" placeholder="Email Address"></div>
+            <div class="input-group"><input type="password" id="password" placeholder="Password"></div>
+            <button id="signInBtn" class="btn-primary">Sign In</button>
+            <button id="signUpBtn" class="btn-secondary">Sign Up</button>
+            <p id="status-message"></p>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app-wrapper" class="hidden w-full h-screen flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white h-screen fixed top-0 left-0 shadow-lg z-20 flex flex-col" id="sidebar">
+            <div class="px-6 py-5 border-b border-platinum-border">
+                <a href="index.html" class="text-2xl font-bold text-platinum-blue">Platinum<span class="text-platinum-green">.</span></a>
+            </div>
+            <nav id="sidebar-nav" class="flex-grow px-4 py-4 space-y-1 overflow-y-auto">
+                <p class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
+                <a href="#dashboard" data-page="dashboard" data-title="Dashboard" class="nav-item flex items-center px-3 py-2.5 rounded-lg group hover:bg-platinum-light-blue transition-colors">
+                    <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-platinum-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg>
+                    Dashboard
+                </a>
+                <a href="#parcels" data-page="parcels" data-title="Manage Parcels" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-platinum-light-blue hover:text-platinum-blue transition-colors">
+                    <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-platinum-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10.5 11.25h3M12 15h.008m-1.008-7.5H7.5m1.586-3.424A2.252 2.252 0 017.5 4.5H6.75A2.25 2.25 0 004.5 6.75v.25M12 3v1.5m0 15V21m-3.75-1.5H6.75m10.5 0h1.5m-1.5 0S16.5 9.75 12 9.75s-4.5 4.5-4.5 4.5m9 0h1.5" /></svg>
+                    Parcels
+                </a>
+                <a href="#revenue" data-page="revenue" data-title="Revenue Analytics" class="nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-platinum-light-blue hover:text-platinum-blue transition-colors">
+                    <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-platinum-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0h.75A.75.75 0 015.25 6v.75m0 0v-.75A.75.75 0 014.5 5.25h-.75M6.75 7.5v.75A.75.75 0 016 9h-.75m0 0v-.75A.75.75 0 016 7.5h.75m0 0h.75a.75.75 0 01.75.75v.75m0 0v-.75a.75.75 0 01-.75-.75h-.75m2.25-4.5v.75a.75.75 0 01-.75.75h-.75m0 0V5.25a.75.75 0 01.75-.75h.75m0 0h.75a.75.75 0 01.75.75v.75m0 0v-.75a.75.75 0 01-.75-.75h-.75m2.25 2.25v.75a.75.75 0 01-.75.75h-.75m0 0V7.5a.75.75 0 01.75-.75h.75m0 0h.75a.75.75 0 01.75.75v.75m0 0v-.75a.75.75 0 01-.75-.75h-.75M12 18.75v-6m0 0H9.75m2.25 0h2.25M12 12.75l1.07-1.588a.75.75 0 00-.67-.912h-2.794a.75.75 0 00-.67.912L12 12.75z" /></svg>
+                    Revenue
+                </a>
+            </nav>
+            <div class="px-4 py-4 mt-auto border-t border-platinum-border">
+                <a href="#" id="logoutBtn" class="flex items-center px-3 py-2.5 rounded-lg text-gray-700 group hover:bg-platinum-light-blue hover:text-platinum-blue transition-colors">
+                    <svg class="w-5 h-5 mr-3 text-gray-500 group-hover:text-platinum-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                    Log Out
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <div id="main-content-container" class="flex-1 ml-64 p-6 md:p-8 overflow-y-auto">
+            <!-- Top Bar -->
+            <header class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 id="main-header-title" class="text-3xl font-bold text-platinum-dark">Dashboard</h1>
+                    <p id="main-header-subtitle" class="text-sm text-gray-500">Overview of your Platinum operations.</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="font-medium text-sm text-platinum-dark">Welcome back,</p>
+                        <p id="user-email-display" class="text-xs text-gray-500">user@example.com</p>
+                    </div>
+                    <img src="https://picsum.photos/40" alt="User Avatar" class="w-10 h-10 rounded-full cursor-pointer">
+                </div>
+            </header>
+
+            <!-- Page Content Area -->
+            <div id="page-content-area">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content" class="page-content space-y-6">
+                    <!-- Stat Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">Total Parcels</h3><p id="stat-total-parcels" class="text-3xl font-bold text-platinum-dark mt-1">0</p></div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">Parcels In Transit</h3><p id="stat-in-transit" class="text-3xl font-bold text-platinum-dark mt-1">0</p></div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">Parcels Delivered</h3><p id="stat-delivered" class="text-3xl font-bold text-platinum-dark mt-1">0</p></div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">Pending Issues</h3><p id="stat-issues" class="text-3xl font-bold text-platinum-dark mt-1">0</p></div>
+                    </div>
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-lg font-semibold text-platinum-dark">Parcel Volume Trend</h3><div class="chart-container h-64"> <canvas id="parcelVolumeChart"></canvas> </div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-lg font-semibold text-platinum-dark">Parcel Status Breakdown</h3><div class="chart-container h-64"> <canvas id="parcelStatusChart"></canvas> </div></div>
+                    </div>
+                    <!-- Recent Parcels Table -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border">
+                        <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-semibold text-platinum-dark">Recent Parcels</h3><a href="#parcels" class="text-sm text-platinum-blue hover:underline nav-item" data-page="parcels" data-title="Manage Parcels">View All Parcels</a></div>
+                        <div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Tracking #</th><th scope="col" class="px-6 py-3">Status</th><th scope="col" class="px-6 py-3">Recipient</th><th scope="col" class="px-6 py-3">Destination</th><th scope="col" class="px-6 py-3">Date</th><th scope="col" class="px-6 py-3">Action</th></tr></thead><tbody id="recent-parcels-table-body"><tr><td colspan="6" class="text-center p-4">No parcels found.</td></tr></tbody></table></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border">
+                        <h3 class="text-lg font-semibold text-platinum-dark mb-4">Quick Actions</h3>
+                        <div class="flex space-x-4"><button id="show-parcel-modal-btn" class="flex-1 flex items-center justify-center text-left py-3 px-4 bg-platinum-blue text-white rounded-lg hover:bg-blue-700 transition-colors transform hover:scale-105"><svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>Create New Parcel</button></div>
+                    </div>
+                </div>
+
+                <!-- Parcels Content -->
+                <div id="parcels-content" class="page-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-platinum-dark">All Your Parcels</h2>
+                            <div class="flex items-center space-x-2">
+                                <button id="show-track-modal-btn" class="py-2 px-4 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                                    Track Parcel
+                                </button>
+                                <button id="show-parcel-modal-btn-2" class="py-2 px-4 bg-platinum-blue text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                    Add New Parcel
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-6 overflow-x-auto"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Tracking #</th><th scope="col" class="px-6 py-3">Status</th><th scope="col" class="px-6 py-3">Recipient</th><th scope="col" class="px-6 py-3">Origin</th> <th scope="col" class="px-6 py-3">Destination</th><th scope="col" class="px-6 py-3">Last Update</th><th scope="col" class="px-6 py-3">Actions</th></tr></thead><tbody id="all-parcels-table-body"><tr><td colspan="7" class="text-center p-4">No parcels found.</td></tr></tbody></table></div>
+                    </div>
+                </div>
+
+                <!-- Revenue Content -->
+                <div id="revenue-content" class="page-content space-y-6">
+                    <!-- Revenue Stat Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">This Month's Revenue</h3><p id="stat-monthly-revenue" class="text-3xl font-bold text-platinum-dark mt-1">K0.00</p></div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">Year-to-Date Revenue</h3><p id="stat-ytd-revenue" class="text-3xl font-bold text-platinum-dark mt-1">K0.00</p></div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-platinum-border"><h3 class="text-sm font-medium text-gray-500">Next Month Projection</h3><p id="stat-projection" class="text-3xl font-bold text-gray-400 mt-1">K0.00</p></div>
+                    </div>
+                    <!-- Revenue Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-platinum-border">
+                            <h3 class="text-lg font-semibold text-platinum-dark mb-4">Revenue by Branch</h3>
+                            <div class="chart-container h-80">
+                                <canvas id="revenueByLocationChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg border border-platinum-border">
+                            <h3 class="text-lg font-semibold text-platinum-dark mb-4">Monthly Revenue Trend</h3>
+                            <div class="chart-container h-80">
+                                <canvas id="revenueProjectionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track Parcel Content -->
+                <div id="track-parcel-content" class="page-content">
+                    <div class="mb-4"><a href="#parcels" data-page="parcels" data-title="Manage Parcels" class="nav-item text-sm text-platinum-blue hover:underline flex items-center"><svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>Back to Parcels List</a></div>
+                    <div class="flex flex-col lg:flex-row gap-6 w-full" style="height: calc(100vh - 12rem);">
+                        <!-- Left Panel: Details & Timeline -->
+                        <div class="lg:w-2/5 xl:w-1/3 bg-white rounded-xl shadow-lg border border-platinum-border tracking-left-panel">
+                            <div class="p-4 border-b border-platinum-border flex-shrink-0">
+                                <div class="flex justify-between items-start">
+                                    <div><h2 id="tracking-parcel-id-display" class="text-lg font-semibold text-platinum-dark">Parcel ID</h2><p id="tracking-parcel-status-display" class="text-sm font-medium">Status</p></div>
+                                </div>
+                                <div class="mt-3 text-xs text-gray-500 space-y-1">
+                                    <p><strong>Origin:</strong> <span id="tracking-origin-display" class="font-medium text-gray-700"></span></p>
+                                    <p><strong>Destination:</strong> <span id="tracking-destination-display" class="font-medium text-gray-700"></span></p>
+                                </div>
+                            </div>
+                            <div class="border-b border-platinum-border flex-shrink-0">
+                                <nav class="flex -mb-px px-4" id="tracking-page-tabs"><button data-tab="live-track" class="tab-button active text-sm py-3 px-4 border-b-2 border-transparent hover:text-platinum-blue hover:border-platinum-blue focus:outline-none">Live Track</button><button data-tab="details" class="tab-button text-sm py-3 px-4 border-b-2 border-transparent text-gray-500 hover:text-platinum-blue hover:border-platinum-blue focus:outline-none">Details</button></nav>
+                            </div>
+                            <div class="tracking-left-panel-scrollable p-4 space-y-4">
+                                <!-- Live Track Tab -->
+                                <div id="live-track-tab-content" class="tab-content-tracking active space-y-4">
+                                    <h4 class="text-sm font-semibold text-gray-700">Parcel Timeline</h4>
+                                    <ul id="tracking-timeline-list" class="space-y-4"></ul>
+                                    <div class="mt-6 pt-4 border-t border-gray-200">
+                                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Live Demo</h4>
+                                        <p id="simulation-status" class="text-xs text-gray-500 mb-2 h-8">Click the button to simulate the driver's movement in real-time.</p>
+                                        <button id="start-simulation-btn" class="w-full py-2 px-4 bg-platinum-green text-white rounded-lg hover:bg-green-600 transition-colors text-sm flex items-center justify-center">
+                                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></svg>
+                                            Start Live Demo
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Details Tab -->
+                                <div id="details-tab-content" class="tab-content-tracking space-y-3 text-sm">
+                                    <h4 class="font-semibold text-gray-800 border-b pb-2 mb-2">Sender Details</h4>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Name:</strong> <span id="details-sender-name"></span></div>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Contact:</strong> <span id="details-sender-phone"></span></div>
+                                    <h4 class="font-semibold text-gray-800 border-b pb-2 mb-2 pt-2">Recipient Details</h4>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Name:</strong> <span id="details-recipient"></span></div>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Contact:</strong> <span id="details-phone"></span></div>
+                                    <h4 class="font-semibold text-gray-800 border-b pb-2 mb-2 pt-2">Shipment Details</h4>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Weight:</strong> <span id="details-weight"></span></div>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Size:</strong> <span id="details-size"></span></div>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Cost:</strong> <span id="details-cost"></span></div>
+                                    <div><strong class="text-gray-600 w-28 inline-block">Notes:</strong> <span id="details-notes"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Right Panel: Map -->
+                        <div class="lg:w-3/5 xl:w-2/3 rounded-xl shadow-lg border border-platinum-border overflow-hidden tracking-map-panel">
+                            <div id="parcel-google-map"><div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">Map will load here...</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="text-center text-sm text-gray-500 pt-8">© <span id="currentYear"></span> </footer>
+        </div>
+
+    </div>
+
+    <!-- CREATE PARCEL MODAL -->
+    <div id="create-parcel-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all opacity-0 -translate-y-10" id="modal-content">
+            <div class="flex items-center justify-between p-4 border-b"><h3 class="text-lg font-semibold text-platinum-dark">Create a New Parcel</h3><button id="close-modal-btn" class="p-1 rounded-full hover:bg-gray-200"><svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button></div>
+            <form id="create-parcel-form" class="p-6 space-y-4">
+                <!-- SENDER DETAILS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label for="senderName" class="block text-sm font-medium text-gray-700">Sender Name</label><input type="text" id="senderName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                    <div><label for="senderPhone" class="block text-sm font-medium text-gray-700">Sender Phone</label><input type="tel" id="senderPhone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                </div>
+                <!-- RECIPIENT DETAILS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label for="recipientName" class="block text-sm font-medium text-gray-700">Recipient Name</label><input type="text" id="recipientName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                    <div><label for="recipientPhone" class="block text-sm font-medium text-gray-700">Recipient Phone</label><input type="tel" id="recipientPhone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                </div>
+                <!-- LOCATION DETAILS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label for="origin-search-input" class="block text-sm font-medium text-gray-700">Origin Branch</label><input type="text" id="origin-search-input" required placeholder="Search for origin branch..." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                    <div><label for="destination-search-input" class="block text-sm font-medium text-gray-700">Destination Address</label><input type="text" id="destination-search-input" required placeholder="Search for destination..." class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                </div>
+                <!-- PARCEL & COST DETAILS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label for="weight" class="block text-sm font-medium text-gray-700">Weight (kg)</label><input type="number" step="0.1" id="weight" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                    <div><label for="size" class="block text-sm font-medium text-gray-700">Parcel Size</label><select id="size" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"><option>Small</option><option>Medium</option><option>Large</option><option>Extra Large</option></select></div>
+                    <div><label for="cost" class="block text-sm font-medium text-gray-700">Delivery Cost (K)</label><input type="number" step="0.01" id="cost" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></div>
+                </div>
+                <div><label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label><textarea id="notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue"></textarea></div>
+                <p id="modal-status-message" class="text-sm text-center h-4"></p>
+            </form>
+            <div class="flex items-center justify-end p-4 border-t space-x-2"><button id="cancel-modal-btn" type="button" class="py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button><button id="save-parcel-btn" type="submit" form="create-parcel-form" class="py-2 px-4 bg-platinum-blue text-white rounded-lg hover:bg-blue-700">Save Parcel</button></div>
+        </div>
+    </div>
+
+    <!-- TRACK PARCEL MODAL -->
+    <div id="track-parcel-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm transform transition-all opacity-0 -translate-y-10" id="track-modal-content">
+            <div class="flex items-center justify-between p-4 border-b">
+                <h3 class="text-lg font-semibold text-platinum-dark">Track Your Parcel</h3>
+                <button id="close-track-modal-btn" class="p-1 rounded-full hover:bg-gray-200">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <form id="track-parcel-form" class="p-6 space-y-4">
+                <div>
+                    <label for="trackingNumberInput" class="block text-sm font-medium text-gray-700">Enter Tracking Number</label>
+                    <input type="text" id="trackingNumberInput" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-platinum-blue focus:border-platinum-blue" placeholder="e.g., PLT-F9D1A3">
+                </div>
+                <p id="track-modal-status-message" class="text-sm text-center h-4 error"></p>
+                <div class="pt-2">
+                    <button id="find-parcel-btn" type="submit" class="w-full py-2 px-4 bg-platinum-blue text-white rounded-lg hover:bg-blue-700">Find Parcel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Your main application logic, as a module script -->
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, off, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "You api key",
+            authDomain: "your details",
+            databaseURL: "your details",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // --- GLOBAL STATE & DOM Elements ---
+        let parcelDataListener = null;
+        let allUserParcels = [];
+        let currentTrackingParcel = null;
+        let parcelVolumeChartInstance, parcelStatusChartInstance, revenueByLocationChartInstance, revenueProjectionChartInstance;
+        let selectedOrigin = null;
+        let selectedDestination = null;
+
+        // Live Tracking State
+        let activeParcelListener = null;
+        let driverMarker = null;
+        let mapInstance = null;
+        let simulationInterval = null;
+        let originalRoutePath = [];
+        let completedRoutePolyline = null;
+        let remainingRoutePolyline = null;
+
+        const authWrapper = document.getElementById('auth-wrapper');
+        const appWrapper = document.getElementById('app-wrapper');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const signInBtn = document.getElementById('signInBtn');
+        const signUpBtn = document.getElementById('signUpBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const statusMessage = document.getElementById('status-message');
+        const userEmailDisplay = document.getElementById('user-email-display');
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // --- HELPER FUNCTIONS ---
+        const formatCurrency = (amount) => `K${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        function animateValue(element, start, end, duration, formatter) {
+            if (start === end) {
+                if (formatter) element.textContent = formatter(end);
+                else element.textContent = end.toLocaleString();
+                return;
+            }
+
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                let currentValue = start + progress * (end - start);
+
+                if (formatter) {
+                    element.textContent = formatter(currentValue);
+                } else {
+                    element.textContent = Math.floor(currentValue).toLocaleString();
+                }
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- AUTHENTICATION LOGIC ---
+        onAuthStateChanged(auth, (user) => {
+            statusMessage.textContent = '';
+            if (user) {
+                authWrapper.style.display = 'none';
+                appWrapper.classList.remove('hidden');
+                appWrapper.classList.add('flex');
+                userEmailDisplay.textContent = user.email;
+                if (parcelDataListener) parcelDataListener(); // Detach previous listener if it exists
+                listenForParcels(user.uid);
+                handleInitialPageLoad();
+            } else {
+                authWrapper.style.display = 'flex';
+                appWrapper.classList.add('hidden');
+                appWrapper.classList.remove('flex');
+                if (parcelDataListener) parcelDataListener();
+                cleanupTrackingPage();
+            }
+        });
+
+        signInBtn.addEventListener('click', () => { statusMessage.textContent = ''; signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value).catch(err => { statusMessage.className = 'error'; statusMessage.textContent = err.message; }); });
+        signUpBtn.addEventListener('click', () => { statusMessage.textContent = ''; createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value).catch(err => { statusMessage.className = 'error'; statusMessage.textContent = err.message; }); });
+        logoutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(auth); });
+
+        // --- PARCEL DATA HANDLING (FIREBASE) ---
+        function normalizeParcelData(parcel) {
+            if (!parcel.originCoords && parcel.origin) {
+                const name = parcel.origin.toLowerCase();
+                if (name.includes('lusaka')) parcel.originCoords = { lat: -15.4167, lng: 28.2833 };
+                else if (name.includes('ndola')) parcel.originCoords = { lat: -12.9667, lng: 28.6333 };
+                else if (name.includes('kitwe')) parcel.originCoords = { lat: -12.8275, lng: 28.2106 };
+                else if (name.includes('kabwe')) parcel.originCoords = { lat: -14.4319, lng: 28.4428 };
+                else parcel.originCoords = { lat: -15.4167, lng: 28.2833 };
+            }
+            if (!parcel.destinationCoords && parcel.destination) {
+                parcel.destinationCoords = { lat: -15.4167, lng: 28.2833 };
+            }
+            if (!parcel.currentLocationCoords) {
+                parcel.currentLocationCoords = parcel.originCoords;
+            }
+            return parcel;
+        }
+
+        function listenForParcels(userId) {
+            const parcelsRef = ref(database, 'parcels/' + userId);
+            const currentPage = window.location.hash.substring(1).split('/')[0] || 'dashboard';
+
+            parcelDataListener = onValue(parcelsRef, (snapshot) => {
+                const recentParcelsTable = document.getElementById('recent-parcels-table-body');
+                const allParcelsTable = document.getElementById('all-parcels-table-body');
+                recentParcelsTable.innerHTML = '';
+                allParcelsTable.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const parcels = snapshot.val();
+                    allUserParcels = Object.keys(parcels).map(key => ({ id: key, ...normalizeParcelData(parcels[key]) })).sort((a, b) => b.timestamp - a.timestamp);
+
+                    updateStatCards(allUserParcels);
+                    updateDashboardCharts(allUserParcels);
+
+                    allUserParcels.forEach(parcel => allParcelsTable.appendChild(createParcelTableRow(parcel)));
+                    allUserParcels.slice(0, 3).forEach(parcel => recentParcelsTable.appendChild(createParcelTableRow(parcel, true)));
+
+                    if (document.getElementById(currentPage + '-content')?.classList.contains('active')) {
+                        if (currentPage === 'revenue') {
+                            updateRevenuePage(allUserParcels);
+                        }
+                    }
+
+                } else {
+                    allUserParcels = [];
+                    const noDataRow = '<tr><td colspan="7" class="text-center p-4 text-gray-500">No parcels found. Create your first one!</td></tr>';
+                    recentParcelsTable.innerHTML = noDataRow.replace('colspan="7"', 'colspan="6"');
+                    allParcelsTable.innerHTML = noDataRow;
+                    updateStatCards([]);
+                    initDashboardCharts();
+                    if (document.getElementById('revenue-content')?.classList.contains('active')) {
+                        updateRevenuePage([]);
+                    }
+                }
+            });
+        }
+
+        function getStatusBadge(status) {
+            const baseClasses = 'text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full';
+            switch (status) {
+                case 'Processing': return `<span class="bg-blue-100 text-blue-800 ${baseClasses}">${status}</span>`;
+                case 'In Transit': return `<span class="bg-yellow-100 text-yellow-800 ${baseClasses}">${status}</span>`;
+                case 'Delivered': return `<span class="bg-green-100 text-green-800 ${baseClasses}">${status}</span>`;
+                case 'Issue': return `<span class="bg-red-100 text-red-800 ${baseClasses}">${status}</span>`;
+                default: return `<span class="bg-gray-100 text-gray-800 ${baseClasses}">${status}</span>`;
+            }
+        }
+
+        function createParcelTableRow(parcel, isRecent = false) {
+            const row = document.createElement('tr');
+            row.className = 'bg-white border-b hover:bg-gray-50 transition-colors';
+            const formattedDate = new Date(parcel.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const trackingNumber = parcel.trackingNumber || `PLT-${parcel.id.slice(-6).toUpperCase()}`;
+
+            const commonCells = `
+                    <td class="px-6 py-4 font-medium text-gray-900">${trackingNumber}</td>
+                    <td class="px-6 py-4">${getStatusBadge(parcel.status)}</td>
+                    <td class="px-6 py-4">${parcel.recipientName}</td>
+                `;
+
+            if (isRecent) {
+                row.innerHTML = `${commonCells}<td class="px-6 py-4">${parcel.destination}</td><td class="px-6 py-4">${formattedDate}</td><td class="px-6 py-4"><a href="#" data-parcel-id="${parcel.id}" class="track-parcel-link font-medium text-platinum-blue hover:underline">Details</a></td>`;
+            } else {
+                row.innerHTML = `${commonCells}
+                        <td class="px-6 py-4">${parcel.origin}</td>
+                        <td class="px-6 py-4">${parcel.destination}</td>
+                        <td class="px-6 py-4">${formattedDate}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <a href="#" data-parcel-id="${parcel.id}" class="track-parcel-link font-medium text-platinum-blue hover:underline">Track</a>
+                                <a href="#" data-parcel-id="${parcel.id}" class="flag-issue-link font-medium text-yellow-600 hover:underline">Flag</a>
+                                <a href="#" data-parcel-id="${parcel.id}" class="delete-parcel-link font-medium text-red-600 hover:underline">Delete</a>
+                            </div>
+                        </td>`;
+            }
+            return row;
+        }
+
+        function deleteParcel(parcelId) {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("You must be logged in to delete a parcel.");
+                return;
+            }
+            if (!parcelId) {
+                console.error("Delete failed: No parcel ID provided.");
+                return;
+            }
+            const parcelRef = ref(database, `parcels/${user.uid}/${parcelId}`);
+            remove(parcelRef)
+                .then(() => {
+                    console.log(`Parcel ${parcelId} deleted successfully.`);
+                    // The onValue listener will automatically update the UI.
+                })
+                .catch((error) => {
+                    console.error("Error deleting parcel: ", error);
+                    alert("There was an error deleting the parcel. Please try again.");
+                });
+        }
+
+        // --- CREATE PARCEL MODAL & AUTOCOMPLETE LOGIC ---
+        const modal = document.getElementById('create-parcel-modal');
+        const modalContent = document.getElementById('modal-content');
+        const showModalBtn = document.getElementById('show-parcel-modal-btn');
+        const showModalBtn2 = document.getElementById('show-parcel-modal-btn-2');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelModalBtn = document.getElementById('cancel-modal-btn');
+        const createParcelForm = document.getElementById('create-parcel-form');
+        const saveParcelBtn = document.getElementById('save-parcel-btn');
+        const modalStatus = document.getElementById('modal-status-message');
+
+        function initPlacesAutocomplete() {
+            if (!window.isGoogleMapsApiReady) { setTimeout(initPlacesAutocomplete, 200); return; }
+
+            const options = {
+                componentRestrictions: { country: "zm" },
+                fields: ["formatted_address", "geometry", "name"],
+            };
+
+            const originInput = document.getElementById("origin-search-input");
+            const destinationInput = document.getElementById("destination-search-input");
+
+            const originAutocomplete = new google.maps.places.Autocomplete(originInput, options);
+            const destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput, options);
+
+            const setupListener = (autocomplete, input, placeType) => {
+                autocomplete.addListener("place_changed", () => {
+                    modalStatus.textContent = ''; // Clear status on new selection
+                    const place = autocomplete.getPlace();
+
+                    if (place && place.geometry && place.geometry.location) {
+                        const locationData = {
+                            address: place.formatted_address,
+                            coords: {
+                                lat: place.geometry.location.lat(),
+                                lng: place.geometry.location.lng()
+                            }
+                        };
+                        if (placeType === 'origin') {
+                            selectedOrigin = locationData;
+                        } else {
+                            selectedDestination = locationData;
+                        }
+                    } else {
+                        if (placeType === 'origin') {
+                            selectedOrigin = null;
+                        } else {
+                            selectedDestination = null;
+                        }
+                        input.value = "";
+                        modalStatus.className = 'error';
+                        modalStatus.textContent = `Invalid ${placeType}. Please select a location from the dropdown.`;
+                    }
+                });
+            };
+
+            setupListener(originAutocomplete, originInput, 'origin');
+            setupListener(destinationAutocomplete, destinationInput, 'destination');
+        }
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('opacity-0', '-translate-y-10');
+                modalContent.classList.add('opacity-100', 'translate-y-0');
+                initPlacesAutocomplete();
+            }, 10);
+        }
+
+        function closeModal() {
+            modalContent.classList.add('opacity-0', '-translate-y-10');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                createParcelForm.reset();
+                modalStatus.textContent = '';
+                modalStatus.className = 'text-sm text-center h-4';
+                selectedOrigin = null;
+                selectedDestination = null;
+            }, 300);
+        }
+
+        showModalBtn.addEventListener('click', openModal);
+        showModalBtn2.addEventListener('click', openModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        createParcelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            modalStatus.textContent = '';
+            const user = auth.currentUser;
+            if (!user) { modalStatus.className = 'error'; modalStatus.textContent = 'You are not logged in!'; return; }
+
+            if (!selectedOrigin || !selectedOrigin.coords) {
+                modalStatus.className = 'error';
+                modalStatus.textContent = 'Please select a valid origin branch from the search suggestions.';
+                return;
+            }
+            if (!selectedDestination || !selectedDestination.coords) {
+                modalStatus.className = 'error';
+                modalStatus.textContent = 'Please select a valid destination address from the search suggestions.';
+                return;
+            }
+
+            const userParcelsRef = ref(database, 'parcels/' + user.uid);
+            const newParcelRef = push(userParcelsRef);
+            const trackingNumber = `PLT-${newParcelRef.key.slice(-6).toUpperCase()}`;
+
+            const parcelData = {
+                trackingNumber,
+                senderName: document.getElementById('senderName').value,
+                senderPhone: document.getElementById('senderPhone').value,
+                recipientName: document.getElementById('recipientName').value,
+                recipientPhone: document.getElementById('recipientPhone').value,
+                origin: selectedOrigin.address,
+                destination: selectedDestination.address,
+                weight: parseFloat(document.getElementById('weight').value),
+                size: document.getElementById('size').value,
+                cost: parseFloat(document.getElementById('cost').value),
+                notes: document.getElementById('notes').value,
+                status: 'Processing',
+                timestamp: Date.now(),
+                createdBy: user.uid,
+                originCoords: selectedOrigin.coords,
+                destinationCoords: selectedDestination.coords,
+                currentLocationCoords: selectedOrigin.coords,
+            };
+
+            saveParcelBtn.disabled = true; saveParcelBtn.textContent = 'Saving...';
+            set(newParcelRef, parcelData).then(() => {
+                modalStatus.className = 'success'; modalStatus.textContent = 'Parcel created successfully!';
+                setTimeout(() => closeModal(), 1000);
+            }).catch(error => {
+                modalStatus.className = 'error'; modalStatus.textContent = 'Error: ' + error.message;
+            }).finally(() => { saveParcelBtn.disabled = false; saveParcelBtn.textContent = 'Save Parcel'; });
+        });
+
+        // --- TRACK PARCEL MODAL LOGIC ---
+        const trackModal = document.getElementById('track-parcel-modal');
+        const trackModalContent = document.getElementById('track-modal-content');
+        const showTrackModalBtn = document.getElementById('show-track-modal-btn');
+        const closeTrackModalBtn = document.getElementById('close-track-modal-btn');
+        const trackParcelForm = document.getElementById('track-parcel-form');
+        const trackingNumberInput = document.getElementById('trackingNumberInput');
+        const trackModalStatus = document.getElementById('track-modal-status-message');
+
+        function openTrackModal() {
+            trackModal.classList.remove('hidden');
+            setTimeout(() => {
+                trackModalContent.classList.remove('opacity-0', '-translate-y-10');
+                trackModalContent.classList.add('opacity-100', 'translate-y-0');
+                trackingNumberInput.focus(); // Auto-focus on the input
+            }, 10);
+        }
+
+        function closeTrackModal() {
+            trackModalContent.classList.add('opacity-0', '-translate-y-10');
+            setTimeout(() => {
+                trackModal.classList.add('hidden');
+                trackParcelForm.reset();
+                trackModalStatus.textContent = '';
+            }, 300);
+        }
+
+        showTrackModalBtn.addEventListener('click', openTrackModal);
+        closeTrackModalBtn.addEventListener('click', closeTrackModal);
+        trackModal.addEventListener('click', (e) => {
+            if (e.target === trackModal) {
+                closeTrackModal();
+            }
+        });
+
+        trackParcelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            trackModalStatus.textContent = '';
+            const trackingNumberToFind = trackingNumberInput.value.trim();
+
+            if (!trackingNumberToFind) {
+                trackModalStatus.textContent = 'Please enter a tracking number.';
+                return;
+            }
+
+            // Search case-insensitively
+            const foundParcel = allUserParcels.find(p => p.trackingNumber.toLowerCase() === trackingNumberToFind.toLowerCase());
+
+            if (foundParcel) {
+                closeTrackModal();
+                showPage('track-parcel', foundParcel);
+                window.location.hash = `track-parcel/${foundParcel.id}`;
+            } else {
+                trackModalStatus.textContent = 'Tracking number not found.';
+            }
+        });
+
+
+        // --- DASHBOARD CHARTS AND STATS ---
+        function updateStatCards(parcels = []) {
+            const statTotalEl = document.getElementById('stat-total-parcels');
+            const statTransitEl = document.getElementById('stat-in-transit');
+            const statDeliveredEl = document.getElementById('stat-delivered');
+            const statIssuesEl = document.getElementById('stat-issues');
+
+            const newTotal = parcels.length;
+            const newTransit = parcels.filter(p => p.status === 'In Transit').length;
+            const newDelivered = parcels.filter(p => p.status === 'Delivered').length;
+            const newIssues = parcels.filter(p => p.status === 'Issue').length;
+
+            const parseStat = (el) => parseInt(el.textContent.replace(/,/g, '')) || 0;
+
+            animateValue(statTotalEl, parseStat(statTotalEl), newTotal, 1500);
+            animateValue(statTransitEl, parseStat(statTransitEl), newTransit, 1500);
+            animateValue(statDeliveredEl, parseStat(statDeliveredEl), newDelivered, 1500);
+            animateValue(statIssuesEl, parseStat(statIssuesEl), newIssues, 1500);
+        }
+
+        function initDashboardCharts(statusData = { 'Processing': 0, 'In Transit': 0, 'Delivered': 0, 'Issue': 0 }) {
+            if (parcelVolumeChartInstance) parcelVolumeChartInstance.destroy();
+            parcelVolumeChartInstance = new Chart(document.getElementById('parcelVolumeChart').getContext('2d'), { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Parcels (Sample)', data: [12, 19, 15, 22, 18, 25, 21], borderColor: '#007bff', backgroundColor: 'rgba(0, 123, 255, 0.1)', tension: 0.3, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, legend: { display: false } } });
+
+            if (parcelStatusChartInstance) parcelStatusChartInstance.destroy();
+            parcelStatusChartInstance = new Chart(document.getElementById('parcelStatusChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(statusData), datasets: [{ data: Object.values(statusData), backgroundColor: ['rgba(0, 123, 255, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(40, 167, 69, 0.7)', 'rgba(220, 53, 69, 0.7)'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, legend: { position: 'bottom' }, cutoutPercentage: 40 } });
+        }
+
+        function updateDashboardCharts(parcels = []) {
+            const statusCounts = { 'Processing': 0, 'In Transit': 0, 'Delivered': 0, 'Issue': 0 };
+            parcels.forEach(p => { if (statusCounts.hasOwnProperty(p.status)) { statusCounts[p.status]++; } });
+
+            if (!parcelStatusChartInstance) initDashboardCharts(statusCounts);
+            else {
+                parcelStatusChartInstance.data.datasets[0].data = Object.values(statusCounts);
+                parcelStatusChartInstance.data.labels = Object.keys(statusCounts);
+                parcelStatusChartInstance.update();
+            }
+        }
+
+        // --- REVENUE PAGE LOGIC ---
+        function calculateRevenueMetrics(parcels = []) {
+            const revenueByBranch = {
+                'Lusaka': 0, 'Ndola': 0, 'Kitwe': 0, 'Kabwe': 0,
+                'Livingstone': 0, 'Chipata': 0, 'Mongu': 0,
+            };
+
+            let monthlyTotal = 0;
+            let ytdTotal = 0;
+
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            parcels.forEach(p => {
+                const revenue = p.cost || 0; // Use the new 'cost' field. Fallback to 0 if not present.
+                ytdTotal += revenue;
+
+                const parcelDate = new Date(p.timestamp);
+                if (parcelDate.getFullYear() === currentYear && parcelDate.getMonth() === currentMonth) {
+                    monthlyTotal += revenue;
+                }
+
+                const originBranch = Object.keys(revenueByBranch).find(branch =>
+                    p.origin.toLowerCase().includes(branch.toLowerCase())
+                );
+
+                if (originBranch) {
+                    revenueByBranch[originBranch] += revenue;
+                }
+            });
+
+            return { monthlyTotal, ytdTotal, revenueByBranch };
+        }
+
+        function updateRevenuePage(parcels) {
+            const { monthlyTotal, ytdTotal, revenueByBranch } = calculateRevenueMetrics(parcels);
+
+            const monthlyEl = document.getElementById('stat-monthly-revenue');
+            const ytdEl = document.getElementById('stat-ytd-revenue');
+            const projectionEl = document.getElementById('stat-projection');
+
+            const projectionTotal = monthlyTotal * 1.15;
+            const parseCurrency = (el) => parseFloat(el.textContent.replace(/[K,]/g, '')) || 0;
+
+            animateValue(monthlyEl, parseCurrency(monthlyEl), monthlyTotal, 1500, formatCurrency);
+            animateValue(ytdEl, parseCurrency(ytdEl), ytdTotal, 1500, formatCurrency);
+            animateValue(projectionEl, parseCurrency(projectionEl), projectionTotal, 1500, formatCurrency);
+
+            initOrUpdateRevenueCharts(revenueByBranch);
+        }
+
+        function initOrUpdateRevenueCharts(branchData = {}) {
+            const locCtx = document.getElementById('revenueByLocationChart').getContext('2d');
+            const locations = Object.keys(branchData);
+            const revenues = Object.values(branchData);
+
+            if (revenueByLocationChartInstance) revenueByLocationChartInstance.destroy();
+            revenueByLocationChartInstance = new Chart(locCtx, {
+                type: 'bar',
+                data: {
+                    labels: locations,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenues,
+                        backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, legend: { display: false }, scales: { yAxes: [{ ticks: { beginAtZero: true, callback: (value) => `K${value / 1000}k` } }] } }
+            });
+
+            const projCtx = document.getElementById('revenueProjectionChart').getContext('2d');
+            if (revenueProjectionChartInstance) revenueProjectionChartInstance.destroy();
+            revenueProjectionChartInstance = new Chart(projCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                    datasets: [
+                        {
+                            label: 'Actual Revenue',
+                            data: [125000, 140000, 180000, 165000, 210000, 195000],
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                        },
+                        {
+                            label: 'Projected Revenue',
+                            data: [null, null, null, null, null, 195000, 220000, 245000],
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            borderDash: [5, 5],
+                        }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { yAxes: [{ ticks: { callback: (value) => `K${value / 1000}k` } }] } }
+            });
+        }
+
+        // --- DYNAMIC PAGE NAVIGATION (SPA) ---
+        const pageContents = document.querySelectorAll('#page-content-area .page-content');
+        const mainHeaderTitle = document.getElementById('main-header-title');
+        const mainHeaderSubtitle = document.getElementById('main-header-subtitle');
+        const pageSubtitles = {
+            dashboard: "Overview of your Platinum operations.",
+            parcels: "Create, track, and manage all shipments.",
+            revenue: "Analyze your income and performance by branch.",
+            "track-parcel": "Live tracking and details for your shipment."
+        };
+
+        function cleanupTrackingPage() {
+            if (activeParcelListener) { off(ref(database), 'value', activeParcelListener); activeParcelListener = null; }
+            if (simulationInterval) { clearInterval(simulationInterval); simulationInterval = null; }
+            if (completedRoutePolyline) completedRoutePolyline.setMap(null);
+            if (remainingRoutePolyline) remainingRoutePolyline.setMap(null);
+            if (driverMarker) driverMarker.setMap(null);
+            driverMarker = null; mapInstance = null; currentTrackingParcel = null; originalRoutePath = []; completedRoutePolyline = null; remainingRoutePolyline = null;
+        }
+
+        function showPage(pageId, parcel = null) {
+            cleanupTrackingPage();
+
+            const pageLink = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+            const pageTitle = pageLink ? pageLink.dataset.title : (parcel ? `Track: ${parcel.trackingNumber}` : 'Unknown Page');
+
+            pageContents.forEach(c => c.classList.remove('active'));
+            document.getElementById(pageId + '-content')?.classList.add('active');
+            document.querySelectorAll('#sidebar-nav .nav-item').forEach(i => { i.classList.remove('active-nav-link'); if (i.dataset.page === pageId) i.classList.add('active-nav-link'); });
+
+            mainHeaderTitle.textContent = pageTitle;
+            mainHeaderSubtitle.textContent = pageSubtitles[pageId] || "Manage your Platinum account.";
+
+            if (pageId === 'dashboard') {
+                if (!parcelStatusChartInstance || !parcelVolumeChartInstance) initDashboardCharts();
+                updateDashboardCharts(allUserParcels);
+            }
+            if (pageId === 'revenue') {
+                updateRevenuePage(allUserParcels);
+            }
+            if (pageId === 'track-parcel' && parcel) {
+                currentTrackingParcel = parcel;
+                renderTrackingPage(parcel);
+            }
+        }
+
+        document.getElementById('app-wrapper').addEventListener('click', (e) => {
+            const navLink = e.target.closest('.nav-item');
+            const trackLink = e.target.closest('.track-parcel-link');
+            const deleteLink = e.target.closest('.delete-parcel-link');
+            const flagLink = e.target.closest('.flag-issue-link');
+
+            if (navLink) {
+                e.preventDefault();
+                const pageId = navLink.dataset.page;
+                showPage(pageId);
+                window.location.hash = pageId;
+            }
+            if (trackLink) {
+                e.preventDefault();
+                const parcelId = trackLink.dataset.parcelId;
+                const parcelToTrack = allUserParcels.find(p => p.id === parcelId);
+                if (parcelToTrack) {
+                    showPage('track-parcel', parcelToTrack);
+                    window.location.hash = `track-parcel/${parcelId}`;
+                } else {
+                    console.error("Could not find parcel with ID:", parcelId);
+                    showPage('parcels');
+                }
+            }
+            if (deleteLink) {
+                e.preventDefault();
+                const parcelId = deleteLink.dataset.parcelId;
+                if (confirm('Are you sure you want to delete this parcel? This action cannot be undone.')) {
+                    deleteParcel(parcelId);
+                }
+            }
+            if (flagLink) {
+                e.preventDefault();
+                const parcelId = flagLink.dataset.parcelId;
+                const parcel = allUserParcels.find(p => p.id === parcelId);
+                alert(`"Flag Issue" for parcel ${parcel.trackingNumber} clicked. This feature is a work in progress.`);
+                // In a real app, this would open a modal or another page to report an issue.
+            }
+        });
+
+        function handleInitialPageLoad() {
+            let hash = window.location.hash.substring(1);
+            if (hash.startsWith('track-parcel/')) {
+                const checkParcelsLoaded = setInterval(() => {
+                    if (allUserParcels.length > 0) {
+                        clearInterval(checkParcelsLoaded);
+                        const parcelId = hash.split('/')[1];
+                        const parcelToTrack = allUserParcels.find(p => p.id === parcelId);
+                        if (parcelToTrack) showPage('track-parcel', parcelToTrack);
+                        else { console.warn(`Parcel with ID ${parcelId} not found.`); showPage('dashboard'); }
+                    }
+                }, 200);
+                setTimeout(() => { if (!currentTrackingParcel && allUserParcels.length === 0) { clearInterval(checkParcelsLoaded); showPage('dashboard'); } }, 5000);
+            } else {
+                let initialPage = hash || 'dashboard';
+                if (!document.querySelector(`.nav-item[data-page="${initialPage}"]`)) initialPage = 'dashboard';
+                showPage(initialPage);
+            }
+        }
+
+        // --- TRACKING PAGE LOGIC ---
+        function renderTrackingPage(parcel) {
+            document.getElementById('tracking-parcel-id-display').textContent = `Parcel ID: ${parcel.trackingNumber}`;
+            document.getElementById('tracking-parcel-status-display').innerHTML = `Status: ${getStatusBadge(parcel.status)}`;
+            document.getElementById('tracking-origin-display').textContent = parcel.origin;
+            document.getElementById('tracking-destination-display').textContent = parcel.destination;
+
+            // Populate details tab
+            document.getElementById('details-sender-name').textContent = parcel.senderName || 'N/A';
+            document.getElementById('details-sender-phone').textContent = parcel.senderPhone || 'N/A';
+            document.getElementById('details-recipient').textContent = parcel.recipientName;
+            document.getElementById('details-phone').textContent = parcel.recipientPhone;
+            document.getElementById('details-weight').textContent = `${parcel.weight} kg`;
+            document.getElementById('details-size').textContent = parcel.size;
+            document.getElementById('details-cost').textContent = formatCurrency(parcel.cost || 0);
+            document.getElementById('details-notes').textContent = parcel.notes || 'N/A';
+
+            document.getElementById('simulation-status').textContent = "Click the button to simulate the driver's movement in real-time.";
+            const simBtn = document.getElementById('start-simulation-btn');
+            simBtn.disabled = false;
+            simBtn.innerHTML = `<svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></svg> Start Live Demo`;
+            simBtn.onclick = () => startLocationSimulation(parcel);
+
+            updateTimeline(parcel);
+            setupTrackingPageTabs();
+            initTrackingMap(parcel);
+        }
+
+        function updateTimeline(parcel) {
+            const timelineList = document.getElementById('tracking-timeline-list');
+            timelineList.innerHTML = `
+                    <li class="flex items-start relative pl-5"><span class="absolute left-0 top-1.5 flex-shrink-0 w-5 h-5 bg-platinum-blue text-white rounded-full flex items-center justify-center text-xs z-10">✓</span>
+                        <div class="ml-3"><p class="text-xs text-gray-400">${new Date(parcel.timestamp).toLocaleString()}</p><p class="text-sm font-medium text-gray-800">Order Confirmed & Processed</p><p class="text-xs text-gray-500">Awaiting pickup from ${parcel.origin}</p></div>
+                    </li>
+                    ${parcel.status === 'In Transit' ? `<li class="flex items-start relative pl-5"><span class="absolute left-0 top-1.5 flex-shrink-0 w-5 h-5 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs z-10">...</span><div class="ml-3"><p class="text-xs text-gray-400">${new Date().toLocaleTimeString()}</p><p class="text-sm font-medium text-gray-800">In Transit</p><p class="text-xs text-gray-500">Parcel is on its way to ${parcel.destination}</p></div></li>` : ''}
+                    ${parcel.status === 'Delivered' ? `<li class="flex items-start relative pl-5"><span class="absolute left-0 top-1.5 flex-shrink-0 w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-xs z-10">✔</span><div class="ml-3"><p class="text-xs text-gray-400">${new Date().toLocaleString()}</p><p class="text-sm font-medium text-gray-800">Delivered</p><p class="text-xs text-gray-500">Parcel successfully delivered to ${parcel.destination}</p></div></li>` : ''}
+                `;
+        }
+
+        function setupTrackingPageTabs() {
+            const tabButtons = document.querySelectorAll('#tracking-page-tabs .tab-button');
+            const tabContents = document.querySelectorAll('#track-parcel-content .tab-content-tracking');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetTab + '-tab-content') content.classList.add('active');
+                    });
+                });
+            });
+            if (tabButtons.length > 0) tabButtons[0].click();
+        }
+
+        // --- GOOGLE MAPS & LIVE TRACKING ---
+        function findClosestPointIndex(path, point) {
+            let closestIndex = 0;
+            let minDistance = Number.MAX_VALUE;
+            path.forEach((pathPoint, index) => {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(point, pathPoint);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = index;
+                }
+            });
+            return closestIndex;
+        }
+
+        function listenForSingleParcelUpdates(userId, parcelId) {
+            const parcelRef = ref(database, `parcels/${userId}/${parcelId}`);
+            activeParcelListener = onValue(parcelRef, (snapshot) => {
+                if (!snapshot.exists() || !driverMarker) return;
+
+                const updatedParcel = normalizeParcelData({ id: snapshot.key, ...snapshot.val() });
+                const newPosition = new google.maps.LatLng(updatedParcel.currentLocationCoords.lat, updatedParcel.currentLocationCoords.lng);
+
+                if (newPosition) {
+                    driverMarker.setPosition(newPosition);
+                    mapInstance.panTo(newPosition);
+                    updateTimeline(updatedParcel);
+                    document.getElementById('tracking-parcel-status-display').innerHTML = `Status: ${getStatusBadge(updatedParcel.status)}`;
+
+                    if (completedRoutePolyline && remainingRoutePolyline && originalRoutePath.length > 0) {
+                        const closestIndex = findClosestPointIndex(originalRoutePath, newPosition);
+                        const completedPath = originalRoutePath.slice(0, closestIndex + 1);
+                        completedPath.push(newPosition);
+                        completedRoutePolyline.setPath(completedPath);
+                        const remainingPath = [newPosition, ...originalRoutePath.slice(closestIndex + 1)];
+                        remainingRoutePolyline.setPath(remainingPath);
+                    }
+                }
+            });
+        }
+
+        function initTrackingMap(parcel) {
+            if (!window.isGoogleMapsApiReady) { setTimeout(() => initTrackingMap(parcel), 250); return; }
+            const mapElement = document.getElementById('parcel-google-map');
+
+            if (!parcel.originCoords || !parcel.destinationCoords) {
+                mapElement.innerHTML = `<div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 p-4 text-center">Error: Cannot display map. Parcel is missing origin or destination.</div>`;
+                return;
+            }
+
+            mapInstance = new google.maps.Map(mapElement, { zoom: 7, center: parcel.currentLocationCoords, mapTypeId: 'roadmap', disableDefaultUI: true, zoomControl: true, fullscreenControl: true });
+
+            window.directionsService.route({ origin: parcel.originCoords, destination: parcel.destinationCoords, travelMode: 'DRIVING' }, (result, status) => {
+                if (status == 'OK') {
+                    window.directionsRenderer.setMap(mapInstance);
+                    window.directionsRenderer.setDirections(result);
+
+                    originalRoutePath = result.routes[0].overview_path;
+
+                    remainingRoutePolyline = new google.maps.Polyline({ path: originalRoutePath, strokeColor: '#A9A9A9', strokeOpacity: 0.8, strokeWeight: 6, map: mapInstance, icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 4 }, offset: '0', repeat: '20px' }] });
+                    completedRoutePolyline = new google.maps.Polyline({ path: [originalRoutePath[0]], strokeColor: '#007bff', strokeOpacity: 0.9, strokeWeight: 6, map: mapInstance });
+
+                    new google.maps.Marker({ position: parcel.originCoords, map: mapInstance, title: `Origin: ${parcel.origin}`, icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' });
+                    new google.maps.Marker({ position: parcel.destinationCoords, map: mapInstance, title: `Destination: ${parcel.destination}`, icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png' });
+
+                    driverMarker = new google.maps.Marker({ position: parcel.currentLocationCoords, map: mapInstance, title: 'Driver\'s Location', icon: { path: 'M23.5 13c.828 0 1.5.672 1.5 1.5v6c0 .828-.672 1.5-1.5 1.5h-1c-.828 0-1.5-.672-1.5-1.5v-1.5h-16V22c0 .828-.672 1.5-1.5 1.5h-1c-.828 0-1.5-.672-1.5-1.5v-6c0-.828.672-1.5 1.5-1.5h1.5v-4L7.5 2h9l4.5 7v4h2.5zM7.5 13h9V9l-3-4.5h-3L7.5 9v4z', fillColor: '#007bff', fillOpacity: 1, strokeWeight: 0, scale: 1.2, anchor: new google.maps.Point(12, 12) } });
+
+                    const user = auth.currentUser;
+                    if (user) listenForSingleParcelUpdates(user.uid, parcel.id);
+                } else {
+                    console.error('Directions request failed due to ' + status);
+                    mapElement.innerHTML = `<div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 p-4 text-center">Could not calculate route. Status: ${status}.</div>`
+                }
+            });
+        }
+
+        function startLocationSimulation(parcel) {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const simBtn = document.getElementById('start-simulation-btn');
+            simBtn.disabled = true;
+            simBtn.innerHTML = `Simulation Running...`;
+            document.getElementById('simulation-status').textContent = 'Driver is on the move. Watch the map!';
+
+            let step = 0;
+            const totalSteps = 100;
+
+            const parcelRef = ref(database, `parcels/${user.uid}/${parcel.id}`);
+
+            simulationInterval = setInterval(() => {
+                if (step >= totalSteps) {
+                    clearInterval(simulationInterval);
+                    simulationInterval = null;
+                    document.getElementById('simulation-status').textContent = 'Driver has arrived at destination!';
+                    simBtn.innerHTML = `Simulation Finished`;
+                    update(parcelRef, { currentLocationCoords: parcel.destinationCoords, status: 'Delivered' });
+                    return;
+                }
+
+                step++;
+                if (originalRoutePath.length > 0) {
+                    const progressIndex = Math.floor((step / totalSteps) * (originalRoutePath.length - 1));
+                    const newPos = originalRoutePath[progressIndex];
+                    update(parcelRef, { currentLocationCoords: { lat: newPos.lat(), lng: newPos.lng() }, status: 'In Transit' });
+                }
+            }, 500);
+        }
+
+    </script>
+
+</body>
+</html>

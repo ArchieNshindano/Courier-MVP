@@ -1,0 +1,142 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\track_page.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Platinum\\templates\\track_page.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\Dashboard2.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Platinum\\templates\\Dashboard2.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\login.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Platinum\\templates\\login.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\track.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Platinum\\templates\\track.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\home.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Platinum\\templates\\home.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\signup.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Platinum\\templates\\signup.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "track_page.html",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\track_page.html",
+              "RelativeDocumentMoniker": "Platinum\\templates\\track_page.html",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\track_page.html",
+              "RelativeToolTip": "Platinum\\templates\\track_page.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-07-07T23:57:34.375Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "track.html",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\track.html",
+              "RelativeDocumentMoniker": "Platinum\\templates\\track.html",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\track.html",
+              "RelativeToolTip": "Platinum\\templates\\track.html",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-07-07T23:57:20.269Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "home.html",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\home.html",
+              "RelativeDocumentMoniker": "Platinum\\templates\\home.html",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\home.html",
+              "RelativeToolTip": "Platinum\\templates\\home.html",
+              "ViewState": "AgIAAG8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-07-07T23:55:00.968Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "signup.html",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\signup.html",
+              "RelativeDocumentMoniker": "Platinum\\templates\\signup.html",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\signup.html",
+              "RelativeToolTip": "Platinum\\templates\\signup.html",
+              "ViewState": "AgIAAKgAAAAAAAAAAAAAALkAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-07-07T23:54:10.036Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "login.html",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\login.html",
+              "RelativeDocumentMoniker": "Platinum\\templates\\login.html",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\login.html",
+              "RelativeToolTip": "Platinum\\templates\\login.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-07-07T23:53:16.256Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Dashboard2.html",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\Dashboard2.html",
+              "RelativeDocumentMoniker": "Platinum\\templates\\Dashboard2.html",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\ORGANISED\\Git\\Courier-MVP\\Platinum\\templates\\Dashboard2.html",
+              "RelativeToolTip": "Platinum\\templates\\Dashboard2.html",
+              "ViewState": "AgIAAOEDAAAAAAAAAAAAAOMDAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-07-07T23:50:31.541Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:3:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:5:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
